@@ -4,8 +4,10 @@
   <meta charset="utf-8" />
   <title>Select Seats – Aarambh</title>
 
-  <!-- Brand Fonts -->
+  <!-- Google Fonts (matching index.html) -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;500;600;700&family=Pompiere&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
   <style>
     :root{
@@ -14,6 +16,7 @@
       --bg:#FFFFFF;
       --card:#EADFC8;
       --text:#533A5A;
+      --glass: rgba(255,255,255,0.6);
     }
 
     *{box-sizing:border-box}
@@ -26,39 +29,56 @@
       -webkit-font-smoothing:antialiased;
     }
 
-    /* HEADER (matching index.html) */
+    /* Header (same as index.html) */
     header{
       display:flex;
       justify-content:space-between;
       align-items:center;
       padding:18px 28px;
       background:var(--accent);
-      color:#fff;
+      color:var(--bg);
       position:sticky;
       top:0;
       z-index:50;
       box-shadow:0 6px 24px rgba(83,58,90,0.08);
     }
     .brand{display:flex;align-items:center;gap:14px}
-    .brand img{height:56px}
-    .brand h1{
-      margin:0;
-      font-size:18px;
-      letter-spacing:.5px;
-      font-family:'Cinzel Decorative',serif;
-      color:#fff;
-    }
-    nav{display:flex;gap:20px}
-    nav a{
-      color:#fff;
+    .brand img{height:56px;display:block}
+    .brand h1{font-size:18px;margin:0;color:var(--bg);letter-spacing:0.6px;font-family:'Cinzel Decorative', serif !important;}
+    nav{display:flex;gap:20px;align-items:center}
+    nav a{color:var(--bg);text-decoration:none;font-weight:600;padding:6px 8px;border-radius:8px;font-family:inherit}
+    nav a:hover{background:var(--glass);color:var(--bg)}
+
+    .btn-primary{
+      background:var(--accent);
+      color:var(--bg);
+      padding:11px 18px;
+      border-radius:12px;
+      font-weight:800;
       text-decoration:none;
-      font-weight:600;
-      padding:6px 10px;
-      border-radius:8px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 6px 18px rgba(83,58,90,0.12);
+      transition:transform .12s ease,box-shadow .12s ease,opacity .12s ease;
+      font-family: 'Montserrat Alternates', sans-serif;
     }
-    nav a:hover{
-      background:rgba(255,255,255,0.25);
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(83,58,90,0.16);opacity:0.98}
+
+    .btn-secondary{
+      background:transparent;
+      color:var(--accent);
+      padding:10px 16px;
+      border-radius:12px;
+      font-weight:700;
+      text-decoration:none;
+      border:2px solid transparent;
+      transition:background .15s ease,color .15s ease,border-color .15s ease;
+      font-family: 'Montserrat Alternates', sans-serif;
     }
+    .btn-secondary:hover{background:var(--muted);color:var(--text);border-color:var(--accent)}
+
+    .nav-toggle{display:none;background:transparent;border:0;color:var(--bg);font-size:20px;padding:8px;border-radius:8px}
 
     /* WRAPPER */
     .wrap{
@@ -92,8 +112,7 @@
       text-align:center;
     }
 
-    /* ======== ORIGINAL SEAT MAP CSS (RESTORED) ======== */
-    /* Seat map container */
+    /* ===== ORIGINAL SEAT MAP CSS (kept exactly) ===== */
     .seat-map {
       max-width: 900px;
       margin: 0 auto 20px auto;
@@ -105,7 +124,6 @@
       background: #fff;
     }
 
-    /* Seat layout container */
     .seat-layout {
       display: flex;
       gap: 8px;
@@ -146,7 +164,6 @@
       justify-content: center;
     }
 
-    /* Seat size */
     .seat {
       width: 16px;
       height: 16px;
@@ -158,7 +175,6 @@
       flex-shrink: 0;
     }
 
-    /* Seat colors */
     .premium {
       background-color: #f39c12;
       border-color: #d67d00;
@@ -181,7 +197,6 @@
       border-color: #27ae60 !important;
     }
 
-    /* Legend */
     .seat-legend {
       display: flex;
       justify-content: center;
@@ -224,7 +239,6 @@
       border-color: #27ae60;
     }
 
-    /* Continue button */
     #continueBtn {
       display: block;
       margin: 0 auto 30px;
@@ -246,41 +260,25 @@
       background-color: #45263f;
     }
 
-    /* Responsive */
-    @media (max-width: 600px) {
-      body {
-        max-width: 100vw;
-        padding: 0 8px;
-      }
-
-      .seat-map {
-        max-width: 100%;
-        border-radius: 0;
-      }
-
-      .seat-layout {
-        min-width: 880px;
-        justify-content: center;
-      }
-
-      .seat {
-        width: 14px;
-        height: 14px;
-      }
-
-      #continueBtn {
-        width: 100%;
-        padding: 12px 0;
-        font-size: 15px;
-      }
-    }
-
     footer{
       margin-top:30px;
       padding:20px;
       text-align:center;
       color:var(--muted);
       font-size:14px;
+    }
+
+    @media(max-width:720px){
+      nav{position:fixed;right:0;top:64px;background:var(--accent);width:260px;height:calc(100% - 64px);flex-direction:column;align-items:flex-start;padding:20px;gap:14px;transform:translateX(100%);transition:transform .25s ease;z-index:60}
+      nav.open{transform:translateX(0)}
+      nav a{width:100%;padding:10px 12px;border-radius:8px}
+      .nav-toggle{display:inline-flex}
+      header{padding:12px 16px}
+    }
+
+    @media (max-width: 600px) {
+      .seat { width: 14px; height: 14px; }
+      #continueBtn { width: 100%; padding: 12px 0; font-size: 15px; }
     }
   </style>
 
@@ -310,15 +308,18 @@
     const middleCols = Array.from({ length: 15 }, (_, i) => i + 1);
 
     async function fetchBookedSeats() {
-      const querySnapshot = await getDocs(collection(db, "bookings"));
-      const allSeats = [];
-      querySnapshot.forEach(doc => {
-        const seats = doc.data().seats || "";
-        if (seats) {
-          seats.split(",").forEach(s => allSeats.push(s.trim()));
-        }
-      });
-      bookedSeats = new Set(allSeats);
+      try {
+        const querySnapshot = await getDocs(collection(db, "bookings"));
+        const allSeats = [];
+        querySnapshot.forEach(doc => {
+          const seats = doc.data().seats || "";
+          if (seats) seats.split(",").forEach(s => allSeats.push(s.trim()));
+        });
+        bookedSeats = new Set(allSeats);
+      } catch (err) {
+        console.warn('Failed to load booked seats:', err);
+        bookedSeats = new Set();
+      }
     }
 
     function createSeat(section, rowLabel, seatNum) {
@@ -424,46 +425,80 @@
 </head>
 
 <body>
-
-<header>
-  <div class="brand">
-    <img src="AarambhLogo2.png" alt="Aarambh Logo">
-    <div>
-      <h1>Aarambh</h1>
-      <div style="font-size:12px;color:var(--muted);font-family:'Pompiere';">Where every story begins</div>
+  <!-- HEADER (identical to index.html header structure & content) -->
+  <header>
+    <div class="brand">
+      <img src="AarambhLogo2.png" alt="Aarambh logo">
+      <div>
+        <h1 style="font-family:'Cinzel Decorative', serif !important;margin:0;">Aarambh</h1>
+        <div style="font-size:12px;color:var(--muted);font-weight:700;font-family:'Pompiere',cursive !important">
+          Where every story begins
+        </div>
+      </div>
     </div>
+
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+
+    <nav aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="team.html" target="_blank">Team Aarambh</a>
+      <a href="#contact">Contact Us</a>
+      <a class="btn-secondary" href="select-seats.html" style="background:var(--bg);color:var(--accent);border-color:var(--bg);">Book Tickets</a>
+    </nav>
+  </header>
+
+  <script>
+    // mobile nav handling (same as index.html)
+    (function(){
+      var btn = document.querySelector('.nav-toggle');
+      var nav = document.querySelector('header nav');
+      if(!btn || !nav) return;
+
+      btn.addEventListener('click', function(){
+        var open = nav.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+
+      nav.addEventListener('click', function(e){
+        if(e.target.tagName === 'A' && nav.classList.contains('open')){
+          nav.classList.remove('open');
+          btn.setAttribute('aria-expanded','false');
+        }
+      });
+
+      window.addEventListener('resize', function(){
+        if(window.innerWidth > 720){
+          nav.classList.remove('open');
+          btn.setAttribute('aria-expanded','false');
+        }
+      });
+    })();
+  </script>
+
+  <div class="wrap">
+    <h2>Select Your Seats</h2>
+
+    <div class="info" id="selectedSeats">Selected Seats: None</div>
+    <div class="info" id="totalPrice">Total Price: ₹0</div>
+
+    <div class="stage-banner">🎭 STAGE</div>
+
+    <div class="seat-map" id="seatMap">Loading seat map…</div>
+
+    <div class="seat-legend">
+      <div class="legend-item"><div class="seat-icon premium"></div> Premium (₹500)</div>
+      <div class="legend-item"><div class="seat-icon economy"></div> Economy (₹300)</div>
+      <div class="legend-item"><div class="seat-icon booked"></div> Booked</div>
+      <div class="legend-item"><div class="seat-icon selected"></div> Selected</div>
+    </div>
+
+    <button id="continueBtn">Continue</button>
   </div>
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="details.html">Details</a>
-  </nav>
-</header>
-
-<div class="wrap">
-  <h2>Select Your Seats</h2>
-
-  <div class="info" id="selectedSeats">Selected Seats: None</div>
-  <div class="info" id="totalPrice">Total Price: ₹0</div>
-
-  <div class="stage-banner">🎭 STAGE</div>
-
-  <div class="seat-map" id="seatMap">Loading seat map…</div>
-
-  <div class="seat-legend">
-    <div class="legend-item"><div class="seat-icon premium"></div> Premium (₹500)</div>
-    <div class="legend-item"><div class="seat-icon economy"></div> Economy (₹300)</div>
-    <div class="legend-item"><div class="seat-icon booked"></div> Booked</div>
-    <div class="legend-item"><div class="seat-icon selected"></div> Selected</div>
-  </div>
-
-  <button id="continueBtn">Continue</button>
-</div>
-
-<footer>
-  © Team Aarambh — All rights reserved
-</footer>
-
+  <footer>
+    © Team Aarambh — All rights reserved
+  </footer>
 </body>
 </html>
+
 
