@@ -60,7 +60,7 @@
       background:rgba(255,255,255,0.25);
     }
 
-    /* CONTAINER */
+    /* WRAPPER */
     .wrap{
       max-width:1000px;
       margin:40px auto;
@@ -81,7 +81,6 @@
       margin-bottom:10px;
     }
 
-    /* STAGE */
     .stage-banner{
       background:var(--accent);
       color:#fff;
@@ -93,80 +92,187 @@
       text-align:center;
     }
 
-    /* SEAT MAP CARD */
-    .seat-map{
-      background:var(--card);
-      border-radius:14px;
-      padding:20px 10px;
-      box-shadow:0 10px 30px rgba(83,58,90,0.10);
-      overflow-x:auto;
-      margin-bottom:20px;
+    /* ======== ORIGINAL SEAT MAP CSS (RESTORED) ======== */
+    /* Seat map container */
+    .seat-map {
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 12px 0;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
     }
 
-    .seat-layout{
-      display:flex;
-      gap:12px;
-      min-width:880px;
-      justify-content:center;
+    /* Seat layout container */
+    .seat-layout {
+      display: flex;
+      gap: 8px;
+      min-width: 880px;
+      justify-content: center;
     }
 
-    .division{display:flex;flex-direction:column;gap:6px}
-
-    .row{display:flex;gap:4px;justify-content:center}
-
-    .seat{
-      width:16px;
-      height:16px;
-      border-radius:3px;
-      border:1px solid #888;
-      cursor:pointer;
-      transition:0.2s ease;
+    .division.left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+      flex: none;
+      min-width: 150px;
     }
 
-    .premium{background:#f39c12;border-color:#d67d00;}
-    .economy{background:#3498db;border-color:#217dbb;}
-    .booked{background:#7f8c8d !important;border-color:#626a6b !important;cursor:not-allowed;}
-    .selected{background:#2ecc71 !important;border-color:#27ae60 !important;outline:2px solid #27ae60;}
+    .division.middle {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+      flex: none;
+      min-width: 450px;
+    }
 
-    /* LEGEND */
-    .seat-legend{
-      display:flex;
-      justify-content:center;
-      gap:20px;
-      flex-wrap:wrap;
-      margin-bottom:20px;
-      font-size:14px;
+    .division.right {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+      flex: none;
+      min-width: 150px;
     }
-    .legend-item{
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-    .seat-icon{
-      width:14px;height:14px;border-radius:3px;border:1px solid #888;
-    }
-    .seat-icon.premium{background:#f39c12;border-color:#d67d00}
-    .seat-icon.economy{background:#3498db;border-color:#217dbb}
-    .seat-icon.booked{background:#7f8c8d;border-color:#626a6b}
-    .seat-icon.selected{background:#2ecc71;border-color:#27ae60}
 
-    /* BUTTON */
-    #continueBtn{
-      display:block;
-      margin:20px auto;
-      padding:14px 26px;
-      font-weight:700;
-      background:var(--accent);
-      color:#fff;
-      border:none;
-      border-radius:12px;
-      cursor:pointer;
-      font-size:18px;
-      box-shadow:0 6px 20px rgba(83,58,90,0.12);
+    .row {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
     }
-    #continueBtn:hover{
-      transform:translateY(-2px);
-      opacity:.95;
+
+    /* Seat size */
+    .seat {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      cursor: pointer;
+      border: 1px solid #888;
+      user-select: none;
+      transition: background-color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    /* Seat colors */
+    .premium {
+      background-color: #f39c12;
+      border-color: #d67d00;
+    }
+
+    .economy {
+      background-color: #3498db;
+      border-color: #217dbb;
+    }
+
+    .booked {
+      background-color: #7f8c8d !important;
+      border-color: #626a6b !important;
+      cursor: not-allowed;
+    }
+
+    .selected {
+      outline: 2px solid #27ae60;
+      background-color: #2ecc71 !important;
+      border-color: #27ae60 !important;
+    }
+
+    /* Legend */
+    .seat-legend {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .seat-icon {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid #888;
+    }
+
+    .seat-icon.premium {
+      background-color: #f39c12;
+      border-color: #d67d00;
+    }
+
+    .seat-icon.economy {
+      background-color: #3498db;
+      border-color: #217dbb;
+    }
+
+    .seat-icon.booked {
+      background-color: #7f8c8d;
+      border-color: #626a6b;
+    }
+
+    .seat-icon.selected {
+      background-color: #2ecc71;
+      border-color: #27ae60;
+    }
+
+    /* Continue button */
+    #continueBtn {
+      display: block;
+      margin: 0 auto 30px;
+      padding: 10px 24px;
+      background-color: var(--accent);
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      max-width: 280px;
+      text-align: center;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    #continueBtn:hover {
+      background-color: #45263f;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      body {
+        max-width: 100vw;
+        padding: 0 8px;
+      }
+
+      .seat-map {
+        max-width: 100%;
+        border-radius: 0;
+      }
+
+      .seat-layout {
+        min-width: 880px;
+        justify-content: center;
+      }
+
+      .seat {
+        width: 14px;
+        height: 14px;
+      }
+
+      #continueBtn {
+        width: 100%;
+        padding: 12px 0;
+        font-size: 15px;
+      }
     }
 
     footer{
@@ -175,11 +281,6 @@
       text-align:center;
       color:var(--muted);
       font-size:14px;
-    }
-
-    @media(max-width:600px){
-      .seat{width:14px;height:14px}
-      #continueBtn{width:100%;font-size:16px}
     }
   </style>
 
@@ -213,7 +314,9 @@
       const allSeats = [];
       querySnapshot.forEach(doc => {
         const seats = doc.data().seats || "";
-        if (seats) seats.split(",").forEach(s => allSeats.push(s.trim()));
+        if (seats) {
+          seats.split(",").forEach(s => allSeats.push(s.trim()));
+        }
       });
       bookedSeats = new Set(allSeats);
     }
@@ -263,16 +366,16 @@
       seatMap.textContent = "";
 
       const layoutWrapper = document.createElement("div");
-      layoutWrapper.className = "seat-layout";
+      layoutWrapper.classList.add("seat-layout");
 
       const leftDiv = document.createElement("div");
-      leftDiv.className = "division left";
+      leftDiv.classList.add("division", "left");
 
       const middleDiv = document.createElement("div");
-      middleDiv.className = "division middle";
+      middleDiv.classList.add("division", "middle");
 
       const rightDiv = document.createElement("div");
-      rightDiv.className = "division right";
+      rightDiv.classList.add("division", "right");
 
       middleRows.forEach((rowLabel, rowIndex) => {
         const sideSeats = Math.min(2 + rowIndex, 9);
@@ -363,3 +466,4 @@
 
 </body>
 </html>
+
