@@ -26,7 +26,7 @@
       -webkit-font-smoothing:antialiased;
     }
 
-    /* Header (consistent with index/contact) */
+    /* Header (consistent with other pages) */
     header{
       display:flex;
       justify-content:space-between;
@@ -80,8 +80,8 @@
     /* Team grid */
     .team-grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:22px;
+      grid-template-columns:repeat(4,1fr);
+      gap:18px;
       margin-top:10px;
     }
 
@@ -94,7 +94,7 @@
       flex-direction:column;
       align-items:center;
       text-align:center;
-      transition:transform .16s ease,box-shadow .16s ease;
+      transition:transform .12s ease,box-shadow .12s ease;
     }
     .card:hover{transform:translateY(-6px);box-shadow:0 18px 36px rgba(83,58,90,0.12)}
 
@@ -113,20 +113,16 @@
     .avatar img{width:100%;height:100%;object-fit:cover;display:block}
 
     .name{font-weight:800;color:var(--accent);font-family:'Cinzel Decorative',serif;margin-bottom:6px}
-    .role{font-weight:700;color:var(--text);margin-bottom:10px}
-    .bio{font-size:14px;color:rgba(0,0,0,0.7);line-height:1.4;margin-bottom:12px;padding:0 6px}
-
-    .socials{display:flex;gap:10px}
-    .socials a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--accent);text-decoration:none;transition:background .12s ease,transform .12s ease}
-    .socials a:hover{background:rgba(83,58,90,0.06);transform:translateY(-3px)}
 
     /* Responsive */
-    @media(max-width:980px){
+    @media(max-width:1100px){
+      .team-grid{grid-template-columns:repeat(3,1fr)}
+    }
+    @media(max-width:800px){
       .team-grid{grid-template-columns:repeat(2,1fr)}
     }
-    @media(max-width:600px){
+    @media(max-width:480px){
       .team-grid{grid-template-columns:1fr}
-      .hero{flex-direction:column;align-items:flex-start}
       .brand img{height:48px}
     }
 
@@ -158,84 +154,131 @@
   <div class="hero">
     <div>
       <div class="title">Team Aarambh</div>
-      <div class="desc">The people who make the show happen — creators, crew and chaos managers.</div>
+      <div class="desc">The people who make the show happen.</div>
     </div>
   </div>
 
   <section aria-label="Team members">
     <div class="team-grid">
 
-      <!-- Card 1 -->
+      <!-- 1 -->
       <article class="card" aria-labelledby="tm1">
-        <div class="avatar" aria-hidden="true">
-          <img src="team-prathik.jpg" alt="Prathik Kundar">
-        </div>
-        <div id="tm1" class="name">Prathik Kundar</div>
-        <div class="role">Founder & Director</div>
-        <div class="bio">Director, producer and the creative brain behind Aarambh. Leads rehearsals, direction and production decisions.</div>
-        <div class="socials" aria-label="social links">
-          <a href="#" title="Prathik — Instagram" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a>
-          <a href="#" title="Prathik — LinkedIn" aria-label="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v6h-4v-6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v6h-4v-12h4v2"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
-        </div>
+        <div class="avatar" aria-hidden="true"><img src="team-yogesh-patil.jpg" alt="Yogesh Patil"></div>
+        <div id="tm1" class="name">Yogesh Patil</div>
       </article>
 
-      <!-- Card 2 -->
+      <!-- 2 -->
       <article class="card" aria-labelledby="tm2">
-        <div class="avatar"><img src="team-ritu.jpg" alt="Ritu Sharma"></div>
-        <div id="tm2" class="name">Ritu Sharma</div>
-        <div class="role">Production Manager</div>
-        <div class="bio">Handles logistics, schedules, venue coordination and makes sure the crew has what they need on show day.</div>
-        <div class="socials">
-          <a href="#" title="Ritu — Instagram" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a>
-          <a href="#" title="Ritu — LinkedIn" aria-label="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v6h-4v-6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v6h-4v-12h4v2"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
-        </div>
+        <div class="avatar"><img src="team-prathik.jpg" alt="Prathik"></div>
+        <div id="tm2" class="name">Prathik</div>
       </article>
 
-      <!-- Card 3 -->
+      <!-- 3 -->
       <article class="card" aria-labelledby="tm3">
-        <div class="avatar"><img src="team-sameer.jpg" alt="Sameer Patil"></div>
-        <div id="tm3" class="name">Sameer Patil</div>
-        <div class="role">Lead Actor</div>
-        <div class="bio">Main cast member with extensive stage experience — brings characters to life with energy and precision.</div>
-        <div class="socials">
-          <a href="#" title="Sameer — Instagram" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a>
-          <a href="#" title="Sameer — Twitter" aria-label="Twitter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53A4.48 4.48 0 0 0 22.43 1s-4.17 2.26-7.05 4.09a4.48 4.48 0 0 0-7.73 3.06c0 .35.04.7.11 1.03A12.77 12.77 0 0 1 3 2s4.6 2.88 9.15 4.56a12.79 12.79 0 0 1-6.28-.85c.9 3.1 3.2 5.4 6.04 5.98A9.05 9.05 0 0 1 1 17s3.14 2.02 7.24 2.02c8.68 0 13.44-7.2 13.44-13.44v-.61A9.6 9.6 0 0 0 23 3z"/></svg></a>
-        </div>
+        <div class="avatar"><img src="team-lalit-nigaam.jpg" alt="Lalit Nigaam"></div>
+        <div id="tm3" class="name">Lalit Nigaam</div>
       </article>
 
-      <!-- Card 4 -->
+      <!-- 4 -->
       <article class="card" aria-labelledby="tm4">
-        <div class="avatar"><img src="team-anita.jpg" alt="Anita Deshmukh"></div>
-        <div id="tm4" class="name">Anita Deshmukh</div>
-        <div class="role">Music & Sound</div>
-        <div class="bio">Composes and mixes audio, cues sound design and makes sure the performance sounds crisp and immersive.</div>
-        <div class="socials">
-          <a href="#" title="Anita — Instagram" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a>
-          <a href="#" title="Anita — LinkedIn" aria-label="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v6h-4v-6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v6h-4v-12h4v2"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
-        </div>
+        <div class="avatar"><img src="team-nikhil-kalekar.jpg" alt="Nikhil Kalekar"></div>
+        <div id="tm4" class="name">Nikhil Kalekar</div>
       </article>
 
-      <!-- Card 5 -->
+      <!-- 5 -->
       <article class="card" aria-labelledby="tm5">
-        <div class="avatar"><img src="team-poonam.jpg" alt="Poonam Kulkarni"></div>
-        <div id="tm5" class="name">Poonam Kulkarni</div>
-        <div class="role">Costume & Makeup</div>
-        <div class="bio">Designs costumes, manages wardrobe changes and ensures every character looks the part on stage.</div>
-        <div class="socials">
-          <a href="#" title="Poonam — Instagram" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a>
-          <a href="#" title="Poonam — Pinterest" aria-label="Pinterest"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5c0 5.25-3.5 9-8 9-1.6 0-2.96-.83-3.5-1.63 0 0-.75 2.9-.92 3.5-.17.6-1.75.19-1.75-.8 0-1 .3-3.5.3-3.5s-1.15-2-1.15-5c0-4.7 3.12-8.07 8.1-8.07 4.3 0 7.5 3.07 7.5 7.18z"/></svg></a>
-        </div>
+        <div class="avatar"><img src="team-abhilasha-sharma.jpg" alt="Abhilasha Sharma"></div>
+        <div id="tm5" class="name">Abhilasha Sharma</div>
       </article>
 
-      <!-- Card 6 -->
+      <!-- 6 -->
       <article class="card" aria-labelledby="tm6">
-        <div class="avatar"><img src="team-crew.jpg" alt="Crew"></div>
-        <div id="tm6" class="name">Stage Crew</div>
-        <div class="role">Technical Crew</div>
-        <div class="bio">Lighting, stagehands and riggers — silent operators who keep the show running without a hitch.</div>
-        <div class="socials">
-          <a href="#" title="Crew — Instagram" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a>
-        </div>
+        <div class="avatar"><img src="team-nilesh-ghule.jpg" alt="Nilesh Ghule"></div>
+        <div id="tm6" class="name">Nilesh Ghule</div>
+      </article>
+
+      <!-- 7 -->
+      <article class="card" aria-labelledby="tm7">
+        <div class="avatar"><img src="team-vaidehi-pande.jpg" alt="Vaidehi Pande"></div>
+        <div id="tm7" class="name">Vaidehi Pande</div>
+      </article>
+
+      <!-- 8 -->
+      <article class="card" aria-labelledby="tm8">
+        <div class="avatar"><img src="team-ashwini-patil.jpg" alt="Ashwini Patil"></div>
+        <div id="tm8" class="name">Ashwini Patil</div>
+      </article>
+
+      <!-- 9 -->
+      <article class="card" aria-labelledby="tm9">
+        <div class="avatar"><img src="team-tejashree-kumbhar.jpg" alt="Tejashree Kumbhar"></div>
+        <div id="tm9" class="name">Tejashree Kumbhar</div>
+      </article>
+
+      <!-- 10 -->
+      <article class="card" aria-labelledby="tm10">
+        <div class="avatar"><img src="team-riya-debnath.jpg" alt="Riya Debnath"></div>
+        <div id="tm10" class="name">Riya Debnath</div>
+      </article>
+
+      <!-- 11 -->
+      <article class="card" aria-labelledby="tm11">
+        <div class="avatar"><img src="team-minakshi-kalelkar.jpg" alt="Minakshi Kalelkar"></div>
+        <div id="tm11" class="name">Minakshi Kalelkar</div>
+      </article>
+
+      <!-- 12 -->
+      <article class="card" aria-labelledby="tm12">
+        <div class="avatar"><img src="team-mauli-nalawde.jpg" alt="Mauli Nalawde"></div>
+        <div id="tm12" class="name">Mauli Nalawde</div>
+      </article>
+
+      <!-- 13 -->
+      <article class="card" aria-labelledby="tm13">
+        <div class="avatar"><img src="team-aradhana-mohanan.jpg" alt="Aradhana Mohanan"></div>
+        <div id="tm13" class="name">Aradhana Mohanan</div>
+      </article>
+
+      <!-- 14 -->
+      <article class="card" aria-labelledby="tm14">
+        <div class="avatar"><img src="team-rohini-jadhav.jpg" alt="Rohini Jadhav"></div>
+        <div id="tm14" class="name">Rohini Jadhav</div>
+      </article>
+
+      <!-- 15 -->
+      <article class="card" aria-labelledby="tm15">
+        <div class="avatar"><img src="team-kaynat-mirza.jpg" alt="Kaynat Mirza"></div>
+        <div id="tm15" class="name">Kaynat Mirza</div>
+      </article>
+
+      <!-- 16 -->
+      <article class="card" aria-labelledby="tm16">
+        <div class="avatar"><img src="team-saumya-bajpai.jpg" alt="Saumya Bajpai"></div>
+        <div id="tm16" class="name">Saumya Bajpai</div>
+      </article>
+
+      <!-- 17 -->
+      <article class="card" aria-labelledby="tm17">
+        <div class="avatar"><img src="team-amit-mahato.jpg" alt="Amit Mahato"></div>
+        <div id="tm17" class="name">Amit Mahato</div>
+      </article>
+
+      <!-- 18 -->
+      <article class="card" aria-labelledby="tm18">
+        <div class="avatar"><img src="team-shivani-nalawde.jpg" alt="Shivani Nalawde"></div>
+        <div id="tm18" class="name">Shivani Nalawde</div>
+      </article>
+
+      <!-- 19 -->
+      <article class="card" aria-labelledby="tm19">
+        <div class="avatar"><img src="team-dwiti-kariya.jpg" alt="Dwiti Kariya"></div>
+        <div id="tm19" class="name">Dwiti Kariya</div>
+      </article>
+
+      <!-- 20 -->
+      <article class="card" aria-labelledby="tm20">
+        <div class="avatar"><img src="team-bessy-alexander.jpg" alt="Bessy Alexander"></div>
+        <div id="tm20" class="name">Bessy Alexander</div>
       </article>
 
     </div>
