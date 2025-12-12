@@ -4,217 +4,186 @@
   <meta charset="utf-8" />
   <title>Select Seats – Aarambh</title>
 
-  <!-- Integrated CSS -->
+  <!-- Brand Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;500;600;700&family=Pompiere&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@500&display=swap');
-
-    body {
-      font-family: 'Montserrat Alternates', Arial, sans-serif;
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 8px;
-      background: #fff;
-      color: #333;
-      text-align: center;
+    :root{
+      --accent:#533A5A;
+      --muted:#EEB885;
+      --bg:#FFFFFF;
+      --card:#EADFC8;
+      --text:#533A5A;
     }
 
-    h2, .stage-banner, #continueBtn {
-      text-align: center;
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      font-family:'Montserrat Alternates',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
     }
 
-    .stage-banner {
-      background: #333;
-      color: white;
-      font-weight: 600;
-      padding: 8px 0;
-      margin-bottom: 12px;
-      border-radius: 4px;
+    /* HEADER (matching index.html) */
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:18px 28px;
+      background:var(--accent);
+      color:#fff;
+      position:sticky;
+      top:0;
+      z-index:50;
+      box-shadow:0 6px 24px rgba(83,58,90,0.08);
+    }
+    .brand{display:flex;align-items:center;gap:14px}
+    .brand img{height:56px}
+    .brand h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.5px;
+      font-family:'Cinzel Decorative',serif;
+      color:#fff;
+    }
+    nav{display:flex;gap:20px}
+    nav a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:600;
+      padding:6px 10px;
+      border-radius:8px;
+    }
+    nav a:hover{
+      background:rgba(255,255,255,0.25);
     }
 
-    /* Seat map container */
-    .seat-map {
-      max-width: 900px;
-      margin: 0 auto 20px auto;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 12px 0;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: #fff;
+    /* CONTAINER */
+    .wrap{
+      max-width:1000px;
+      margin:40px auto;
+      padding:0 20px;
     }
 
-    /* Seat layout container */
-    .seat-layout {
-      display: flex;
-      gap: 8px;
-      min-width: 880px;
-      justify-content: center;
+    h2{
+      font-family:'Cinzel Decorative',serif;
+      font-size:30px;
+      text-align:center;
+      color:var(--accent);
+      margin-top:0;
     }
 
-    .division.left {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: flex-start;
-      flex: none;
-      min-width: 150px;
+    .info{
+      text-align:center;
+      font-weight:700;
+      margin-bottom:10px;
     }
 
-    .division.middle {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: center;
-      flex: none;
-      min-width: 450px;
+    /* STAGE */
+    .stage-banner{
+      background:var(--accent);
+      color:#fff;
+      font-weight:600;
+      padding:10px 0;
+      border-radius:8px;
+      margin:18px auto;
+      max-width:300px;
+      text-align:center;
     }
 
-    .division.right {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: flex-end;
-      flex: none;
-      min-width: 150px;
+    /* SEAT MAP CARD */
+    .seat-map{
+      background:var(--card);
+      border-radius:14px;
+      padding:20px 10px;
+      box-shadow:0 10px 30px rgba(83,58,90,0.10);
+      overflow-x:auto;
+      margin-bottom:20px;
     }
 
-    .row {
-      display: flex;
-      gap: 4px;
-      justify-content: center;
+    .seat-layout{
+      display:flex;
+      gap:12px;
+      min-width:880px;
+      justify-content:center;
     }
 
-    /* Seat size */
-    .seat {
-      width: 16px;
-      height: 16px;
-      border-radius: 3px;
-      cursor: pointer;
-      border: 1px solid #888;
-      user-select: none;
-      transition: background-color 0.3s ease;
-      flex-shrink: 0;
+    .division{display:flex;flex-direction:column;gap:6px}
+
+    .row{display:flex;gap:4px;justify-content:center}
+
+    .seat{
+      width:16px;
+      height:16px;
+      border-radius:3px;
+      border:1px solid #888;
+      cursor:pointer;
+      transition:0.2s ease;
     }
 
-    /* Seat colors */
-    .premium {
-      background-color: #f39c12;
-      border-color: #d67d00;
+    .premium{background:#f39c12;border-color:#d67d00;}
+    .economy{background:#3498db;border-color:#217dbb;}
+    .booked{background:#7f8c8d !important;border-color:#626a6b !important;cursor:not-allowed;}
+    .selected{background:#2ecc71 !important;border-color:#27ae60 !important;outline:2px solid #27ae60;}
+
+    /* LEGEND */
+    .seat-legend{
+      display:flex;
+      justify-content:center;
+      gap:20px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+      font-size:14px;
+    }
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .seat-icon{
+      width:14px;height:14px;border-radius:3px;border:1px solid #888;
+    }
+    .seat-icon.premium{background:#f39c12;border-color:#d67d00}
+    .seat-icon.economy{background:#3498db;border-color:#217dbb}
+    .seat-icon.booked{background:#7f8c8d;border-color:#626a6b}
+    .seat-icon.selected{background:#2ecc71;border-color:#27ae60}
+
+    /* BUTTON */
+    #continueBtn{
+      display:block;
+      margin:20px auto;
+      padding:14px 26px;
+      font-weight:700;
+      background:var(--accent);
+      color:#fff;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:18px;
+      box-shadow:0 6px 20px rgba(83,58,90,0.12);
+    }
+    #continueBtn:hover{
+      transform:translateY(-2px);
+      opacity:.95;
     }
 
-    .economy {
-      background-color: #3498db;
-      border-color: #217dbb;
+    footer{
+      margin-top:30px;
+      padding:20px;
+      text-align:center;
+      color:var(--muted);
+      font-size:14px;
     }
 
-    .booked {
-      background-color: #7f8c8d !important;
-      border-color: #626a6b !important;
-      cursor: not-allowed;
-    }
-
-    .selected {
-      outline: 2px solid #27ae60;
-      background-color: #2ecc71 !important;
-      border-color: #27ae60 !important;
-    }
-
-    /* Legend */
-    .seat-legend {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      font-size: 13px;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .seat-icon {
-      width: 14px;
-      height: 14px;
-      border-radius: 3px;
-      border: 1px solid #888;
-    }
-
-    .seat-icon.premium {
-      background-color: #f39c12;
-      border-color: #d67d00;
-    }
-
-    .seat-icon.economy {
-      background-color: #3498db;
-      border-color: #217dbb;
-    }
-
-    .seat-icon.booked {
-      background-color: #7f8c8d;
-      border-color: #626a6b;
-    }
-
-    .seat-icon.selected {
-      background-color: #2ecc71;
-      border-color: #27ae60;
-    }
-
-    /* Continue button */
-    #continueBtn {
-      display: block;
-      margin: 0 auto 30px;
-      padding: 10px 24px;
-      background-color: #27ae60;
-      color: white;
-      font-weight: 600;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      font-size: 16px;
-      max-width: 280px;
-      text-align: center;
-      user-select: none;
-      white-space: nowrap;
-    }
-
-    #continueBtn:hover {
-      background-color: #219150;
-    }
-
-    /* Responsive */
-    @media (max-width: 600px) {
-      body {
-        max-width: 100vw;
-        padding: 0 8px;
-      }
-
-      .seat-map {
-        max-width: 100%;
-        border-radius: 0;
-      }
-
-      .seat-layout {
-        min-width: 880px;
-        justify-content: center;
-      }
-
-      .seat {
-        width: 14px;
-        height: 14px;
-      }
-
-      #continueBtn {
-        width: 100%;
-        padding: 12px 0;
-        font-size: 15px;
-      }
+    @media(max-width:600px){
+      .seat{width:14px;height:14px}
+      #continueBtn{width:100%;font-size:16px}
     }
   </style>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase SDK (unchanged logic) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -240,20 +209,13 @@
     const middleCols = Array.from({ length: 15 }, (_, i) => i + 1);
 
     async function fetchBookedSeats() {
-      try {
-        const querySnapshot = await getDocs(collection(db, "bookings"));
-        const allSeats = [];
-        querySnapshot.forEach(doc => {
-          const seats = doc.data().seats || "";
-          if (seats) {
-            seats.split(",").forEach(s => allSeats.push(s.trim()));
-          }
-        });
-        bookedSeats = new Set(allSeats);
-      } catch (err) {
-        console.warn('Failed to load booked seats:', err);
-        // If Firestore fails (CORS / config), page still usable — booked seats won't display.
-      }
+      const querySnapshot = await getDocs(collection(db, "bookings"));
+      const allSeats = [];
+      querySnapshot.forEach(doc => {
+        const seats = doc.data().seats || "";
+        if (seats) seats.split(",").forEach(s => allSeats.push(s.trim()));
+      });
+      bookedSeats = new Set(allSeats);
     }
 
     function createSeat(section, rowLabel, seatNum) {
@@ -301,16 +263,16 @@
       seatMap.textContent = "";
 
       const layoutWrapper = document.createElement("div");
-      layoutWrapper.classList.add("seat-layout");
+      layoutWrapper.className = "seat-layout";
 
       const leftDiv = document.createElement("div");
-      leftDiv.classList.add("division", "left");
+      leftDiv.className = "division left";
 
       const middleDiv = document.createElement("div");
-      middleDiv.classList.add("division", "middle");
+      middleDiv.className = "division middle";
 
       const rightDiv = document.createElement("div");
-      rightDiv.classList.add("division", "right");
+      rightDiv.className = "division right";
 
       middleRows.forEach((rowLabel, rowIndex) => {
         const sideSeats = Math.min(2 + rowIndex, 9);
@@ -359,8 +321,24 @@
 </head>
 
 <body>
-  <h2>Team Aarambh</h2>
-  <h3>Select Your Seats</h3>
+
+<header>
+  <div class="brand">
+    <img src="AarambhLogo2.png" alt="Aarambh Logo">
+    <div>
+      <h1>Aarambh</h1>
+      <div style="font-size:12px;color:var(--muted);font-family:'Pompiere';">Where every story begins</div>
+    </div>
+  </div>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="details.html">Details</a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <h2>Select Your Seats</h2>
 
   <div class="info" id="selectedSeats">Selected Seats: None</div>
   <div class="info" id="totalPrice">Total Price: ₹0</div>
@@ -377,9 +355,11 @@
   </div>
 
   <button id="continueBtn">Continue</button>
+</div>
 
-  <div style="margin-top:18px;">
-    <a href="index.html" style="text-decoration:none;color:#533A5A;font-weight:700;">← Back to event</a>
-  </div>
+<footer>
+  © Team Aarambh — All rights reserved
+</footer>
+
 </body>
 </html>
