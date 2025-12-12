@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Aarambh — Home</title>
+
+  <!-- Theme colors (kept as requested) -->
+  <style>
+    /* FORCE FONT INHERITANCE SITE‑WIDE */
+    *, *::before, *::after{font-family:inherit !important;}
+
+    :root{
+      --accent:#533A5A;   /* Header + Primary Branding */
+      --muted:#EEB885;    /* Subheadings */
+      --bg:#FFFFFF;       /* Background */
+      --card:#EADFC8;     /* Card Background */
+      --text:#533A5A;     /* Standard Text */
+      --glass: rgba(255,255,255,0.6);
+    }
+
+    /* Reset & base */
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      font-family:'Montserrat Alternates', sans-serif !important;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+    }
+
+    /* Typography system (forced) */
+    body{
+      margin:0;
+      font-family: 'Montserrat Alternates', sans-serif; /* Primary body font */
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+    }
+
+    /* Headings use Cinzel Decorative */
+    h1,h2,h3,.hero-title,.lead-copy h2{
+      font-family:'Cinzel Decorative', serif !important;
+      margin:0;
+      color:var(--accent);
+    }
+
+    /* Subtitles & small labels use Pompiere */
+    .secondary{
+  font-family:'Pompiere', cursive !important;
+  letter-spacing:0.4px;
+}
+
+/* All other former-Pompiere elements → back to Montserrat */
+.poster-meta .sub, .countdown-box div:last-child{
+  font-size:10px;
+  color:var(--bg);
+  font-family:'Montserrat Alternates', sans-serif !important;
+}
+/* REMOVE Pompiere from all other places → enforce Montserrat */
+nav a, .lead-copy p, .poster-thumb, footer, .btn-primary, .btn-secondary, .countdown-container{
+  font-family:'Montserrat Alternates', sans-serif !important;
+}
+
+    /* Header */
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:18px 28px;
+      background:var(--accent);
+      color:var(--bg);
+      position:sticky;
+      top:0;
+      z-index:50;
+      box-shadow:0 6px 24px rgba(83,58,90,0.08);
+    }
+    .brand{display:flex;align-items:center;gap:14px}
+    .brand img{height:56px;display:block}
+    .brand h1{font-size:18px;margin:0;color:var(--bg);letter-spacing:0.6px;font-family:'Cinzel Decorative', serif !important;}
+    nav{display:flex;gap:20px;align-items:center}
+    nav a{color:var(--bg);text-decoration:none;font-weight:600;padding:6px 8px;border-radius:8px;font-family:inherit}
+    nav a:hover{background:var(--glass);color:var(--bg)}
+
+    /* Button system */
+    .btn-primary{
+      background:var(--accent);
+      color:var(--bg);
+      padding:11px 18px;
+      border-radius:12px;
+      font-weight:800;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 6px 18px rgba(83,58,90,0.12);
+      transition:transform .12s ease,box-shadow .12s ease,opacity .12s ease;
+      font-family: 'Montserrat Alternates', sans-serif;
+    }
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(83,58,90,0.16);opacity:0.98}
+
+    .btn-secondary{
+      background:transparent;
+      color:var(--accent);
+      padding:10px 16px;
+      border-radius:12px;
+      font-weight:700;
+      text-decoration:none;
+      border:2px solid transparent;
+      transition:background .15s ease,color .15s ease,border-color .15s ease;
+      font-family: 'Montserrat Alternates', sans-serif;
+    }
+    .btn-secondary:hover{background:var(--muted);color:var(--text);border-color:var(--accent)}
+
+    /* Legacy .btn kept as alias for primary for compatibility */
+    .btn{display:inline-block}
+
+    /* Primary container */
+    .wrap{max-width:1100px;margin:44px auto;padding:0 20px}
+
+    /* Hero / Lead card */
+    .lead-card{
+      display:grid;
+      grid-template-columns:1fr 360px;
+      gap:28px;
+      align-items:center;
+      background:var(--card);
+      border-radius:14px;
+      padding:28px;
+      box-shadow:0 10px 30px rgba(83,58,90,0.08);
+    }
+    .lead-copy h2{margin:0 0 10px 0;font-size:28px;color:var(--accent);}
+    .lead-copy p{margin:0 0 18px;color:var(--text);opacity:0.95;font-family:'Montserrat Alternates', sans-serif !important;}
+    .lead-cta{display:flex;gap:12px;align-items:center}
+
+    .secondary{font-size:15px;color:var(--muted);font-weight:700;}
+
+    /* Poster area */
+    .poster-grid{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+    .poster-card{width:220px;border-radius:10px;background:#d8cbb7;overflow:hidden;box-shadow:0 6px 18px rgba(83,58,90,0.06);display:flex;flex-direction:column}
+    .poster-thumb{height:320px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text);font-family:'Montserrat Alternates', sans-serif}
+    .poster-meta{padding:12px;text-align:center;background:rgba(255,255,255,0.25)}
+    .poster-meta .title{font-weight:800;color:var(--accent);font-family:'Cinzel Decorative', serif}
+    .poster-meta .sub{
+  color:var(--text);
+  opacity:0.9;
+  font-size:14px;
+  margin-top:6px;
+  font-family:'Montserrat Alternates', sans-serif !important;
+}
+
+    /* Centered Book button below posters */
+    .book-row{display:flex;justify-content:center;margin-top:22px}
+
+    /* Contact + footer */
+    footer{margin-top:40px;padding:26px 20px;text-align:center;color:var(--muted)}
+
+    /* Responsive */
+    @media (max-width:920px){
+      .lead-card{grid-template-columns:1fr}
+      .lead-copy h2{font-size:22px}
+    }
+    @media (max-width:520px){
+      header{padding:12px 16px}
+      .brand img{height:48px}
+      .wrap{margin:20px auto}
+      .poster-card{width:46%}
+    }
+    /* Mobile-only center alignment for hero title */
+  @media(max-width:520px){
+    .hero-title{
+      text-align:center;
+      width:100%;
+    }
+  }
+  /* Responsive navigation & refinements */
+  .nav-toggle{display:none;background:transparent;border:0;color:var(--bg);font-size:20px;padding:8px;border-radius:8px}
+  @media(max-width:720px){
+    nav{position:fixed;right:0;top:64px;background:var(--accent);width:260px;height:calc(100% - 64px);flex-direction:column;align-items:flex-start;padding:20px;gap:14px;transform:translateX(100%);transition:transform .25s ease;z-index:60}
+    nav.open{transform:translateX(0)}
+    nav a{width:100%;padding:10px 12px;border-radius:8px}
+    .nav-toggle{display:inline-flex}
+    header{padding:12px 16px}
+    .lead-card.minimalist-hero{padding:28px}
+    .lead-copy h2{font-size:28px}
+    .lead-copy p{font-size:16px}
+    .poster-card{width:48%}
+    .poster-thumb{height:220px}
+    .countdown-box{background:var(--accent);border-radius:10px;padding:8px 6px;box-shadow:0 4px 12px rgba(83,58,90,0.10);width:60px;}
+    .countdown-box div:first-child{font-size:18px;font-weight:800;color:var(--bg);}
+  }
+
+  /* FORCE font assignments for specific components */
+  nav a, .brand h1, .lead-copy p, .poster-thumb, footer, .btn-primary, .btn-secondary, .countdown-container {
+    font-family: 'Montserrat Alternates', sans-serif !important;
+  }
+  .poster-meta .title { font-family: 'Cinzel Decorative', serif !important; }
+  h1,h2,h3,.hero-title,.lead-copy h2{ font-family:'Cinzel Decorative', serif !important; }
+  .secondary{
+  font-family:'Pompiere', cursive !important;
+  letter-spacing:0.4px;
+}
+
+</style>
+  <!-- Google Fonts -->
+  
+    <!-- Clean Google Fonts Import -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;600;700&family=Pompiere&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <img src="AarambhLogo2.png" alt="Aarambh logo">
+      <div>
+        <h1 style="font-family:'Cinzel Decorative', serif !important;margin:0;">Aarambh</h1>
+        <div style="font-size:12px;color:var(--muted);font-weight:700;font-family:'Pompiere',cursive !important">Where every story begins</div>
+      </div>
+    </div>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+    <nav aria-label="Primary navigation">
+      <a href="#">Home</a>
+      <a href="team.html" target="_blank">Team Aarambh</a>
+      <a href="#contact">Contact Us</a>
+      <a class="btn-secondary" href="#book" style="background:var(--bg);color:var(--accent);border-color:var(--bg);">Book Tickets</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <!-- Lead / hero card -->
+    <section class="lead-card minimalist-hero" style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;background:var(--card);padding:48px 38px;border-radius:14px;box-shadow:0 10px 30px rgba(83,58,90,0.08);text-align:left;">
+
+  <h2 class="hero-title" style="font-size:42px;font-weight:900;margin-bottom:14px;color:var(--accent);line-height:1.2;font-family:'Cinzel Decorative', serif;">Drama Night 2.0</h2>
+
+  <p class="hero-sub" style="font-family:'Montserrat Alternates', sans-serif !important;font-size:18px;line-height:1.55;opacity:0.9;max-width:700px;margin:0 0 22px;">
+    Season 1 was a runaway hit — and now Team Aarambh returns with Drama Night 2.0, featuring a musical comedy,
+    an untold AI story, and a corporate comedy. Three genres. Fresh energy. One unforgettable night.
+  </p>
+
+  <a class="btn-primary" href="#book" style="font-size:18px;padding:14px 28px;border-radius:14px;align-self:flex-start;">Book Tickets</a>
+</section>
+
+<!-- Full-Width Event Details Bar -->
+<section style="width:100%;background:var(--accent);color:var(--bg);padding:20px 0;margin:30px 0;border-radius:12px;">
+  <div style="max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:0 20px;gap:20px;">
+
+    <!-- DATE -->
+    <div style="flex:1;min-width:220px;text-align:center;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+        <div style="font-size:20px;font-weight:800;font-family:'Montserrat Alternates', sans-serif !important;">16 Jan 2026</div>
+      </div>
+    </div>
+
+    <!-- TIME -->
+    <div style="flex:1;min-width:220px;text-align:center;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div style="font-size:20px;font-weight:800;font-family:'Montserrat Alternates', sans-serif !important;">06:30 PM — 08:30 PM</div>
+      </div>
+    </div>
+
+    <!-- VENUE + MAP -->
+    <div style="flex:1;min-width:220px;text-align:center;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div style="font-size:20px;font-weight:800;font-family:'Montserrat Alternates', sans-serif !important;">Symbiosis College Auditorium</div>
+        <div style="position:relative;width:100%;max-width:260px;border-radius:8px;overflow:hidden;">
+          <div style="width:100%;height:120px;background:#d8cbb7;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;">Map Placeholder</div>
+          
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- Center-Aligned Countdown Timer -->
+<div style="text-align:center;margin:40px 0;">
+
+
+<style>
+  /* Larger, site-appropriate countdown */
+  .countdown-container{font-family:'Montserrat Alternates',sans-serif;text-align:center;padding:6px;}
+  .countdown-boxes{display:flex;justify-content:center;flex-wrap:wrap;gap:18px;align-items:center;}
+  .countdown-box{background:var(--accent);border-radius:12px;padding:14px 10px;box-shadow:0 6px 18px rgba(83,58,90,0.12);width:90px;}
+  .countdown-box div:first-child{font-size:28px;font-weight:800;color:var(--bg);line-height:1}
+  .countdown-box div:last-child{font-size:10px;color:var(--bg);}
+
+  /* slightly narrower on tablets */
+  @media (max-width:920px){
+    .countdown-box{width:78px;padding:12px}
+    .countdown-box div:first-child{font-size:24px}
+  }
+  @media (max-width:520px){
+    .countdown-box{width:64px;padding:10px}
+    .countdown-box div:first-child{font-size:18px}
+    .countdown-box div:last-child{font-size:11px}
+    .countdown-boxes{gap:10px}
+  }
+</style>
+
+<div id="countdown" class="countdown-container" aria-live="polite" aria-atomic="true">
+  <div class="countdown-boxes">
+    <div class="countdown-box"><div id="days">00</div><div>Days</div></div>
+    <div class="countdown-box"><div id="hours">00</div><div>Hours</div></div>
+    <div class="countdown-box"><div id="minutes">00</div><div>Minutes</div></div>
+    <div class="countdown-box"><div id="seconds">00</div><div>Seconds</div></div>
+  </div>
+</div>
+
+<script>
+  // Countdown script (Asia/Kolkata assumed). Target: 16 Jan 2026 18:30 local
+  (function(){
+    var target = new Date('2026-01-16T18:30:00');
+    function pad(n){return n<10? '0'+n : n}
+    function update(){
+      var now = new Date();
+      var diff = target - now;
+      var el = document.getElementById('countdown');
+      if(!el) return;
+      if(diff <= 0){
+        el.innerHTML = '<div style="color:'+getComputedStyle(document.documentElement).getPropertyValue('--accent')+';font-weight:800">Event started</div>';
+        clearInterval(timer);
+        return;
+      }
+      var days = Math.floor(diff / (1000*60*60*24));
+      var hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+      var minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+      var seconds = Math.floor((diff % (1000*60)) / 1000);
+      document.getElementById('days').textContent = String(days).padStart(2,'0');
+      document.getElementById('hours').textContent = pad(hours);
+      document.getElementById('minutes').textContent = pad(minutes);
+      document.getElementById('seconds').textContent = pad(seconds);
+    }
+    update();
+    var timer = setInterval(update,1000);
+  })();
+</script>
+
+</div>
+
+<!-- Restored: Posters grid, Book button, Contact section + icons, Footer, WhatsApp link -->
+  <section aria-label="Posters" style="margin:30px auto;max-width:1100px;padding:0 20px">
+    <div class="poster-grid">
+      <div class="poster-card">
+        <div class="poster-thumb" style="padding:0;overflow:hidden;"><img src="7c8d9d86-8e95-44f6-8b63-6413497a8bd1.png" alt="Kahaani Thodi Filmy Hai Poster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="poster-meta"><div class="title">Kahaani Thodi Filmy Hai</div><div class="sub">A musical comedy play</div></div>
+      </div>
+
+      <div class="poster-card">
+        <div class="poster-thumb" style="padding:0;overflow:hidden;"><img src="7acae731-9081-473a-be6f-ce233df647bf.png" alt="Humsafar Express Poster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="poster-meta"><div class="title">Humsafar Express</div><div class="sub">An untold AI story</div></div>
+      </div>
+
+      <div class="poster-card">
+        <div class="poster-thumb" style="padding:0;overflow:hidden;"><img src="140486e8-3bdc-4234-b03a-664be95508d5.png" alt="Jaldi Kar Panvel Nikalna Hai Poster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="poster-meta"><div class="title">Jaldi Kar Panvel Nikalna Hai</div><div class="sub">A Corporate Comedy Play</div></div>
+      </div>
+    </div>
+
+    <div class="book-row" style="margin-top:22px"><a class="btn-primary" href="#book">Book Tickets</a></div>
+  </section>
+
+  <!-- Contact + Footer -->
+  <footer id="contact">
+    <div style="max-width:900px;margin:20px auto;padding:20px;text-align:center">
+      <div style="margin-bottom:14px;font-weight:700;color:var(--accent)">Contact</div>
+
+      <div style="display:flex;justify-content:center;gap:28px;margin-bottom:18px;">
+        <!-- PHONE -->
+        <a href="tel:+917700046566" aria-label="Call +91 77000 46566" style="text-decoration:none;color:var(--accent);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3.1 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72 12.4 12.4 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 11a16 16 0 0 0 6 6l1.36-1.18a2 2 0 0 1 2.11-.45 12.4 12.4 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </a>
+
+        <!-- EMAIL -->
+        <a href="mailto:tickets.aarambh@gmail.com" aria-label="Email tickets.aarambh@gmail.com" style="text-decoration:none;color:var(--accent);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </a>
+
+        <!-- WHATSAPP -->
+        <a href="https://wa.me/917700046566" target="_blank" aria-label="Chat on WhatsApp" style="text-decoration:none;color:var(--accent);">
+          <svg width="30" height="30" viewBox="0 0 32 32" fill="var(--accent)"><path d="M16.04 3C9.4 3 4 8.4 4 15.04c0 2.64.84 5.12 2.28 7.16L4 29l7.04-2.28c1.96 1.24 4.28 1.96 6.72 1.96 6.64 0 12.04-5.4 12.04-12.04C29.8 8.4 24.4 3 16.04 3zm7.16 17.2c-.28.84-1.64 1.56-2.28 1.64-.6.12-1.36.16-2.2-.12-.52-.16-1.2-.4-2.04-.8-3.56-1.6-5.88-5.24-6.04-5.48-.2-.28-1.44-1.92-1.44-3.64 0-1.72.92-2.56 1.28-2.92.28-.28.76-.4 1.2-.4h.84c.28 0 .64-.08.96.72.28.84.92 2.92 1 3.12.08.2.12.44.04.72-.08.28-.12.44-.24.68-.12.2-.24.36-.36.56-.12.16-.24.36-.12.6.12.28.56 1.36 1.2 2.2.84 1.16 1.52 1.52 1.8 1.68.28.16.44.12.6-.08.16-.2.68-.8.84-1.08.2-.28.36-.24.6-.16.28.08 1.72.84 2 1 .28.12.48.16.56.24.12.08.12.88-.16 1.72z"/></svg>
+        </a>
+      </div>
+
+      <div style="margin-top:6px;color:var(--muted)">© Team Aarambh — All rights reserved</div>
+    </div>
+  </footer>
+
+
+<script>
+  // Mobile nav toggle
+  (function(){
+    var btn = document.querySelector('.nav-toggle');
+    var nav = document.querySelector('header nav');
+    if(!btn || !nav) return;
+    btn.addEventListener('click', function(){
+      var open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    // close nav on link click (mobile)
+    nav.addEventListener('click', function(e){
+      if(e.target.tagName === 'A' && nav.classList.contains('open')){
+        nav.classList.remove('open');
+        btn.setAttribute('aria-expanded','false');
+      }
+    });
+    // ensure nav visible on resize
+    window.addEventListener('resize', function(){
+      if(window.innerWidth > 720){ nav.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+    });
+  })();
+</script>
+</body>
+</html>
