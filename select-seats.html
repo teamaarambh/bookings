@@ -240,15 +240,20 @@
     const middleCols = Array.from({ length: 15 }, (_, i) => i + 1);
 
     async function fetchBookedSeats() {
-      const querySnapshot = await getDocs(collection(db, "bookings"));
-      const allSeats = [];
-      querySnapshot.forEach(doc => {
-        const seats = doc.data().seats || "";
-        if (seats) {
-          seats.split(",").forEach(s => allSeats.push(s.trim()));
-        }
-      });
-      bookedSeats = new Set(allSeats);
+      try {
+        const querySnapshot = await getDocs(collection(db, "bookings"));
+        const allSeats = [];
+        querySnapshot.forEach(doc => {
+          const seats = doc.data().seats || "";
+          if (seats) {
+            seats.split(",").forEach(s => allSeats.push(s.trim()));
+          }
+        });
+        bookedSeats = new Set(allSeats);
+      } catch (err) {
+        console.warn('Failed to load booked seats:', err);
+        // If Firestore fails (CORS / config), page still usable — booked seats won't display.
+      }
     }
 
     function createSeat(section, rowLabel, seatNum) {
@@ -281,3 +286,100 @@
 
       return seat;
     }
+
+    function updateInfo() {
+      document.getElementById("selectedSeats").textContent =
+        "Selected Seats: " + (selectedSeats.length ? selectedSeats.join(", ") : "None");
+      document.getElementById("totalPrice").textContent =
+        "Total Price: ₹" + totalPrice;
+    }
+
+    async function renderSeats() {
+      await fetchBookedSeats();
+
+      const seatMap = document.getElementById("seatMap");
+      seatMap.textContent = "";
+
+      const layoutWrapper = document.createElement("div");
+      layoutWrapper.classList.add("seat-layout");
+
+      const leftDiv = document.createElement("div");
+      leftDiv.classList.add("division", "left");
+
+      const middleDiv = document.createElement("div");
+      middleDiv.classList.add("division", "middle");
+
+      const rightDiv = document.createElement("div");
+      rightDiv.classList.add("division", "right");
+
+      middleRows.forEach((rowLabel, rowIndex) => {
+        const sideSeats = Math.min(2 + rowIndex, 9);
+
+        const leftRow = document.createElement("div");
+        leftRow.classList.add("row");
+        for (let i = 1; i <= sideSeats; i++) {
+          leftRow.appendChild(createSeat("L", rowLabel, i));
+        }
+        leftDiv.appendChild(leftRow);
+
+        const middleRow = document.createElement("div");
+        middleRow.classList.add("row");
+        middleCols.forEach(col => {
+          middleRow.appendChild(createSeat("M", rowLabel, col));
+        });
+        middleDiv.appendChild(middleRow);
+
+        const rightRow = document.createElement("div");
+        rightRow.classList.add("row");
+        for (let i = 1; i <= sideSeats; i++) {
+          rightRow.appendChild(createSeat("R", rowLabel, i));
+        }
+        rightDiv.appendChild(rightRow);
+      });
+
+      layoutWrapper.append(leftDiv, middleDiv, rightDiv);
+      seatMap.appendChild(layoutWrapper);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderSeats();
+
+      document.getElementById("continueBtn").addEventListener("click", () => {
+        if (selectedSeats.length === 0) {
+          alert("Please select at least one seat to continue.");
+          return;
+        }
+        sessionStorage.setItem("selectedSeats", JSON.stringify(selectedSeats));
+        sessionStorage.setItem("totalPrice", totalPrice);
+        window.location.href = "details.html";
+      });
+    });
+  </script>
+
+</head>
+
+<body>
+  <h2>Team Aarambh</h2>
+  <h3>Select Your Seats</h3>
+
+  <div class="info" id="selectedSeats">Selected Seats: None</div>
+  <div class="info" id="totalPrice">Total Price: ₹0</div>
+
+  <div class="stage-banner">🎭 STAGE</div>
+
+  <div class="seat-map" id="seatMap">Loading seat map…</div>
+
+  <div class="seat-legend">
+    <div class="legend-item"><div class="seat-icon premium"></div> Premium (₹500)</div>
+    <div class="legend-item"><div class="seat-icon economy"></div> Economy (₹300)</div>
+    <div class="legend-item"><div class="seat-icon booked"></div> Booked</div>
+    <div class="legend-item"><div class="seat-icon selected"></div> Selected</div>
+  </div>
+
+  <button id="continueBtn">Continue</button>
+
+  <div style="margin-top:18px;">
+    <a href="index.html" style="text-decoration:none;color:#533A5A;font-weight:700;">← Back to event</a>
+  </div>
+</body>
+</html>
