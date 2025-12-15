@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Aarambh • Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;600;700&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --accent:#533A5A;
+  --muted:#EEB885;
+  --bg:#ffffff;
+  --card:#EADFC8;
+  --text:#533A5A;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Montserrat Alternates',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.wrap{max-width:1100px;margin:40px auto;padding:0 20px}
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:28px;
+  box-shadow:0 10px 30px rgba(83,58,90,0.08);
+}
+h2{
+  font-family:'Cinzel Decorative',serif;
+  margin:0 0 20px;
+  color:var(--accent);
+  text-align:center;
+}
+input{
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  width:100%;
+  max-width:360px;
+}
+button{
+  padding:10px 16px;
+  border-radius:10px;
+  border:none;
+  background:var(--accent);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+button:hover{opacity:.9}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  margin-top:20px;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  font-size:14px;
+}
+th{
+  background:var(--accent);
+  color:white;
+  cursor:pointer;
+}
+tr:nth-child(even){background:#f6f2eb}
+.center{display:flex;justify-content:center;align-items:center;min-height:100vh}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginView" class="center">
+  <div class="card" style="max-width:420px;text-align:center">
+    <h2>🔐 Admin Login</h2>
+    <input id="email" placeholder="Email">
+    <br><br>
+    <input id="password" type="password" placeholder="Password">
+    <br><br>
+    <button id="loginBtn">Login</button>
+    <p id="loginError" style="color:#c0392b;margin-top:10px"></p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardView" style="display:none">
+  <div class="wrap">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2>🎟️ Aarambh Bookings</h2>
+        <button id="logoutBtn">Logout</button>
+      </div>
+
+      <input id="searchInput" placeholder="Search bookings…">
+
+      <table id="bookingsTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>WhatsApp</th>
+            <th>Seats</th>
+            <th>Payment ID</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsBody">
+          <tr><td colspan="5">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* Firebase config */
+const firebaseConfig = {
+  apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
+  authDomain: "aarambh-ticket-bookings.firebaseapp.com",
+  projectId: "aarambh-ticket-bookings",
+  storageBucket: "aarambh-ticket-bookings.firebasestorage.app",
+  messagingSenderId: "269445606104",
+  appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* Auth state */
+onAuthStateChanged(auth, user => {
+  if (user) {
+    loginView.style.display = "none";
+    dashboardView.style.display = "block";
+    loadBookings();
+  } else {
+    loginView.style.display = "flex";
+    dashboardView.style.display = "none";
+  }
+});
+
+/* Login */
+loginBtn.onclick = async () => {
+  loginError.textContent = "";
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      email.value.trim(),
+      password.value
+    );
+  } catch (err) {
+    loginError.textContent = err.message;
+  }
+};
+
+/* Logout */
+logoutBtn.onclick = () => signOut(auth);
+
+/* Load bookings */
+async function loadBookings(){
+  const body = document.getElementById("bookingsBody");
+  body.innerHTML = "";
+  const snap = await getDocs(collection(db,"bookings"));
+  snap.forEach(doc=>{
+    const b = doc.data();
+    body.innerHTML += `
+      <tr>
+        <td>${b.name||""}</td>
+        <td>${b.whatsapp||""}</td>
+        <td>${b.seats||""}</td>
+        <td>${b.payment_id||""}</td>
+        <td>${b.timestamp ? new Date(b.timestamp).toLocaleString() : ""}</td>
+      </tr>`;
+  });
+}
+
+/* Search */
+searchInput.onkeyup = () => {
+  const f = searchInput.value.toLowerCase();
+  [...bookingsBody.rows].forEach(r=>{
+    r.style.display = r.innerText.toLowerCase().includes(f) ? "" : "none";
+  });
+};
+</script>
+
+</body>
+</html>
