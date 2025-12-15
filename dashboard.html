@@ -54,10 +54,7 @@ button{
 button:hover{opacity:.9}
 
 /* TABLE */
-.table-wrap{
-  width:100%;
-  overflow-x:auto;
-}
+.table-wrap{width:100%;overflow-x:auto}
 table{
   width:100%;
   border-collapse:collapse;
@@ -79,44 +76,43 @@ th{
 tr:nth-child(even){background:#f6f2eb}
 
 /* Column widths */
-th:nth-child(1), td:nth-child(1){ width:18%; }
-th:nth-child(2), td:nth-child(2){ width:18%; }
-th:nth-child(3), td:nth-child(3){ width:30%; }
-th:nth-child(4), td:nth-child(4){ width:8%;  text-align:center;}
-th:nth-child(5), td:nth-child(5){ width:12%; }
-th:nth-child(6), td:nth-child(6){ width:14%; }
+th:nth-child(1), td:nth-child(1){width:16%}
+th:nth-child(2), td:nth-child(2){width:16%}
+th:nth-child(3), td:nth-child(3){width:30%}
+th:nth-child(4), td:nth-child(4){width:6%;text-align:center}
+th:nth-child(5), td:nth-child(5){width:14%}
+th:nth-child(6), td:nth-child(6){width:10%}
+th:nth-child(7), td:nth-child(7){width:8%}
 
-/* Seat badges */
-.seat-badges{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-}
-.seat-badge{
+/* Seat grouping badges */
+.seat-groups{display:flex;flex-wrap:wrap;gap:6px}
+.seat-group{
   background:var(--accent);
   color:white;
   padding:4px 8px;
   border-radius:6px;
   font-size:12px;
   font-weight:600;
-  white-space:nowrap;
 }
 
-/* Prevent overflow elsewhere */
-td:not(:nth-child(3)){
-  white-space:nowrap;
+/* Wrapping */
+td:nth-child(3),
+td:nth-child(5),
+td:nth-child(6),
+td:nth-child(7){
+  white-space:normal;
+  word-break:break-word;
 }
+
+.date-block{line-height:1.3}
+.date-block .date{font-weight:600}
+.date-block .time{font-size:12px;opacity:.8}
 
 .center{
   display:flex;
   justify-content:center;
   align-items:center;
   min-height:100vh;
-}
-
-@media(max-width:768px){
-  th,td{font-size:13px}
-  td:not(:nth-child(3)){white-space:normal}
 }
 </style>
 </head>
@@ -127,10 +123,8 @@ td:not(:nth-child(3)){
 <div id="loginView" class="center">
   <div class="card" style="max-width:420px;text-align:center">
     <h2>🔐 Admin Login</h2>
-    <input id="email" placeholder="Email">
-    <br><br>
-    <input id="password" type="password" placeholder="Password">
-    <br><br>
+    <input id="email" placeholder="Email"><br><br>
+    <input id="password" type="password" placeholder="Password"><br><br>
     <button id="loginBtn">Login</button>
     <p id="loginError" style="color:#c0392b;margin-top:10px"></p>
   </div>
@@ -140,27 +134,31 @@ td:not(:nth-child(3)){
 <div id="dashboardView" style="display:none">
   <div class="wrap">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
         <h2>🎟️ Aarambh Bookings</h2>
-        <button id="logoutBtn">Logout</button>
+        <div>
+          <button id="exportBtn">⬇ Export CSV</button>
+          <button id="logoutBtn">Logout</button>
+        </div>
       </div>
 
       <input id="searchInput" placeholder="Search bookings…">
 
       <div class="table-wrap">
-        <table id="bookingsTable">
+        <table>
           <thead>
             <tr>
               <th>Name</th>
               <th>WhatsApp</th>
-              <th>Seats</th>
+              <th>Seats (Grouped)</th>
               <th>Qty</th>
               <th>Payment ID</th>
               <th>Date</th>
+              <th>Time</th>
             </tr>
           </thead>
           <tbody id="bookingsBody">
-            <tr><td colspan="6">Loading…</td></tr>
+            <tr><td colspan="7">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -186,61 +184,95 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-onAuthStateChanged(auth, user => {
-  if (user) {
-    loginView.style.display = "none";
-    dashboardView.style.display = "block";
-    loadBookings();
-  } else {
-    loginView.style.display = "flex";
-    dashboardView.style.display = "none";
-  }
+onAuthStateChanged(auth, user=>{
+  loginView.style.display = user ? "none" : "flex";
+  dashboardView.style.display = user ? "block" : "none";
+  if(user) loadBookings();
 });
 
-loginBtn.onclick = async () => {
-  loginError.textContent = "";
-  try {
-    await signInWithEmailAndPassword(auth, email.value.trim(), password.value);
-  } catch (err) {
-    loginError.textContent = err.message;
-  }
-};
+loginBtn.onclick = ()=>signInWithEmailAndPassword(auth,email.value,password.value).catch(e=>loginError.textContent=e.message);
+logoutBtn.onclick = ()=>signOut(auth);
 
-logoutBtn.onclick = () => signOut(auth);
+/* Seat grouping */
+function groupSeats(seats){
+  const groups = {};
+  seats.forEach(s=>{
+    const m = s.match(/R(\d+)C(\d+)/i);
+    if(!m) return;
+    const r = "R"+m[1];
+    const c = "C"+m[2];
+    groups[r] = groups[r] || [];
+    groups[r].push(c);
+  });
+  return groups;
+}
+
+function formatGroups(groups){
+  return Object.entries(groups)
+    .map(([r,cs])=>`${r}: ${cs.join(", ")}`)
+    .join(" | ");
+}
 
 async function loadBookings(){
-  const body = document.getElementById("bookingsBody");
-  body.innerHTML = "";
-  const snap = await getDocs(collection(db,"bookings"));
+  const body=document.getElementById("bookingsBody");
+  body.innerHTML="";
+  const snap=await getDocs(collection(db,"bookings"));
 
   snap.forEach(doc=>{
-    const b = doc.data();
-    const seatsArr = typeof b.seats === "string"
-      ? b.seats.split(",").map(s => s.trim()).filter(Boolean)
-      : Array.isArray(b.seats) ? b.seats : [];
+    const b=doc.data();
+    const seats = typeof b.seats==="string"
+      ? b.seats.split(",").map(s=>s.trim()).filter(Boolean)
+      : Array.isArray(b.seats)?b.seats:[];
+    const grouped=groupSeats(seats);
+    const groupedText=formatGroups(grouped);
 
-    const seatBadges = seatsArr.map(
-      s => `<span class="seat-badge">${s}</span>`
-    ).join("");
+    const badges = Object.entries(grouped)
+      .map(([r,cs])=>`<span class="seat-group">${r}: ${cs.join(", ")}</span>`)
+      .join("");
 
-    body.innerHTML += `
-      <tr>
-        <td>${b.name || ""}</td>
-        <td>${b.whatsapp || ""}</td>
-        <td><div class="seat-badges">${seatBadges}</div></td>
-        <td>${seatsArr.length}</td>
-        <td>${b.payment_id || ""}</td>
-        <td>${b.timestamp ? new Date(b.timestamp).toLocaleString() : ""}</td>
-      </tr>
-    `;
+    const d = b.timestamp ? new Date(b.timestamp) : null;
+
+    body.innerHTML+=`
+      <tr data-export='${JSON.stringify({
+        name:b.name||"",
+        whatsapp:b.whatsapp||"",
+        seats:groupedText,
+        qty:seats.length,
+        payment:b.payment_id||"",
+        date:d?d.toLocaleDateString():"",
+        time:d?d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):""
+      })}'>
+        <td>${b.name||""}</td>
+        <td>${b.whatsapp||""}</td>
+        <td><div class="seat-groups">${badges}</div></td>
+        <td>${seats.length}</td>
+        <td>${b.payment_id||""}</td>
+        <td>${d?d.toLocaleDateString():""}</td>
+        <td>${d?d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):""}</td>
+      </tr>`;
   });
 }
 
-searchInput.onkeyup = () => {
-  const f = searchInput.value.toLowerCase();
+/* Search */
+searchInput.onkeyup=()=>{
+  const f=searchInput.value.toLowerCase();
   [...bookingsBody.rows].forEach(r=>{
-    r.style.display = r.innerText.toLowerCase().includes(f) ? "" : "none";
+    r.style.display=r.innerText.toLowerCase().includes(f)?"":"none";
   });
+};
+
+/* EXPORT */
+exportBtn.onclick=()=>{
+  let csv=["Name,WhatsApp,Seats,Seat Count,Payment ID,Date,Time"];
+  [...bookingsBody.rows].forEach(r=>{
+    const d=JSON.parse(r.dataset.export);
+    csv.push(`"${d.name}","${d.whatsapp}","${d.seats}",${d.qty},"${d.payment}","${d.date}","${d.time}"`);
+  });
+  const blob=new Blob([csv.join("\n")],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="aarambh-bookings.csv";
+  a.click();
 };
 </script>
 
