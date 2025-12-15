@@ -52,24 +52,72 @@ button{
   cursor:pointer;
 }
 button:hover{opacity:.9}
+
+/* TABLE */
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+}
 table{
   width:100%;
   border-collapse:collapse;
   background:white;
   margin-top:20px;
+  table-layout:fixed;
 }
 th,td{
   padding:10px;
   border-bottom:1px solid #ddd;
   font-size:14px;
+  vertical-align:top;
 }
 th{
   background:var(--accent);
   color:white;
-  cursor:pointer;
+  text-align:left;
 }
 tr:nth-child(even){background:#f6f2eb}
-.center{display:flex;justify-content:center;align-items:center;min-height:100vh}
+
+/* Column widths */
+th:nth-child(1), td:nth-child(1){ width:18%; }
+th:nth-child(2), td:nth-child(2){ width:18%; }
+th:nth-child(3), td:nth-child(3){ width:30%; }
+th:nth-child(4), td:nth-child(4){ width:8%;  text-align:center;}
+th:nth-child(5), td:nth-child(5){ width:12%; }
+th:nth-child(6), td:nth-child(6){ width:14%; }
+
+/* Seat badges */
+.seat-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.seat-badge{
+  background:var(--accent);
+  color:white;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:12px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* Prevent overflow elsewhere */
+td:not(:nth-child(3)){
+  white-space:nowrap;
+}
+
+.center{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+
+@media(max-width:768px){
+  th,td{font-size:13px}
+  td:not(:nth-child(3)){white-space:normal}
+}
 </style>
 </head>
 
@@ -92,46 +140,39 @@ tr:nth-child(even){background:#f6f2eb}
 <div id="dashboardView" style="display:none">
   <div class="wrap">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
         <h2>🎟️ Aarambh Bookings</h2>
         <button id="logoutBtn">Logout</button>
       </div>
 
       <input id="searchInput" placeholder="Search bookings…">
 
-      <table id="bookingsTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>WhatsApp</th>
-            <th>Seats</th>
-            <th>Payment ID</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody id="bookingsBody">
-          <tr><td colspan="5">Loading…</td></tr>
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table id="bookingsTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>WhatsApp</th>
+              <th>Seats</th>
+              <th>Qty</th>
+              <th>Payment ID</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsBody">
+            <tr><td colspan="6">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* Firebase config */
 const firebaseConfig = {
   apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
   authDomain: "aarambh-ticket-bookings.firebaseapp.com",
@@ -145,7 +186,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* Auth state */
 onAuthStateChanged(auth, user => {
   if (user) {
     loginView.style.display = "none";
@@ -157,42 +197,45 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-/* Login */
 loginBtn.onclick = async () => {
   loginError.textContent = "";
   try {
-    await signInWithEmailAndPassword(
-      auth,
-      email.value.trim(),
-      password.value
-    );
+    await signInWithEmailAndPassword(auth, email.value.trim(), password.value);
   } catch (err) {
     loginError.textContent = err.message;
   }
 };
 
-/* Logout */
 logoutBtn.onclick = () => signOut(auth);
 
-/* Load bookings */
 async function loadBookings(){
   const body = document.getElementById("bookingsBody");
   body.innerHTML = "";
   const snap = await getDocs(collection(db,"bookings"));
+
   snap.forEach(doc=>{
     const b = doc.data();
+    const seatsArr = typeof b.seats === "string"
+      ? b.seats.split(",").map(s => s.trim()).filter(Boolean)
+      : Array.isArray(b.seats) ? b.seats : [];
+
+    const seatBadges = seatsArr.map(
+      s => `<span class="seat-badge">${s}</span>`
+    ).join("");
+
     body.innerHTML += `
       <tr>
-        <td>${b.name||""}</td>
-        <td>${b.whatsapp||""}</td>
-        <td>${b.seats||""}</td>
-        <td>${b.payment_id||""}</td>
+        <td>${b.name || ""}</td>
+        <td>${b.whatsapp || ""}</td>
+        <td><div class="seat-badges">${seatBadges}</div></td>
+        <td>${seatsArr.length}</td>
+        <td>${b.payment_id || ""}</td>
         <td>${b.timestamp ? new Date(b.timestamp).toLocaleString() : ""}</td>
-      </tr>`;
+      </tr>
+    `;
   });
 }
 
-/* Search */
 searchInput.onkeyup = () => {
   const f = searchInput.value.toLowerCase();
   [...bookingsBody.rows].forEach(r=>{
