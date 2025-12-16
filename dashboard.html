@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +11,6 @@
 <style>
 :root{
   --accent:#533A5A;
-  --muted:#EEB885;
   --bg:#ffffff;
   --card:#EADFC8;
   --text:#533A5A;
@@ -22,25 +22,16 @@ body{
   background:var(--bg);
   color:var(--text);
 }
-.wrap{max-width:1100px;margin:40px auto;padding:0 20px}
-.card{
-  background:var(--card);
-  border-radius:14px;
-  padding:28px;
-  box-shadow:0 10px 30px rgba(83,58,90,0.08);
-}
-h2{
-  font-family:'Cinzel Decorative',serif;
-  margin:0 0 20px;
-  color:var(--accent);
-  text-align:center;
-}
+.wrap{max-width:1300px;margin:40px auto;padding:0 20px}
+.card{background:var(--card);border-radius:16px;padding:28px}
+h2{font-family:'Cinzel Decorative',serif;margin:0}
+
 input{
   padding:10px 12px;
   border-radius:8px;
   border:1px solid #ccc;
   width:100%;
-  max-width:360px;
+  max-width:420px;
 }
 button{
   padding:10px 16px;
@@ -52,14 +43,18 @@ button{
   cursor:pointer;
 }
 button:hover{opacity:.9}
+button.wa{background:#25D366}
 
-/* TABLE */
+.stat{background:white;padding:16px 22px;border-radius:12px;margin:20px 0}
+.stat .label{font-size:12px;opacity:.7}
+.stat .value{font-size:26px;font-weight:800}
+
 .table-wrap{width:100%;overflow-x:auto}
 table{
   width:100%;
   border-collapse:collapse;
-  background:white;
   margin-top:20px;
+  background:white;
   table-layout:fixed;
 }
 th,td{
@@ -68,51 +63,69 @@ th,td{
   font-size:14px;
   vertical-align:top;
 }
-th{
-  background:var(--accent);
-  color:white;
-  text-align:left;
-}
+th{background:var(--accent);color:white;text-align:left}
 tr:nth-child(even){background:#f6f2eb}
 
-/* Column widths */
-th:nth-child(1), td:nth-child(1){width:16%}
-th:nth-child(2), td:nth-child(2){width:16%}
-th:nth-child(3), td:nth-child(3){width:30%}
-th:nth-child(4), td:nth-child(4){width:6%;text-align:center}
-th:nth-child(5), td:nth-child(5){width:14%}
-th:nth-child(6), td:nth-child(6){width:10%}
-th:nth-child(7), td:nth-child(7){width:8%}
+td:nth-child(4),
+td:nth-child(6){word-break:break-word}
 
-/* Seat grouping badges */
-.seat-groups{display:flex;flex-wrap:wrap;gap:6px}
-.seat-group{
+.seat-badge{
   background:var(--accent);
   color:white;
   padding:4px 8px;
   border-radius:6px;
   font-size:12px;
-  font-weight:600;
+  display:inline-block;
 }
 
-/* Wrapping */
-td:nth-child(3),
-td:nth-child(5),
-td:nth-child(6),
-td:nth-child(7){
-  white-space:normal;
-  word-break:break-word;
+.wa-btn{
+  background:#25D366;
+  color:white;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:12px;
+  text-decoration:none;
+  font-weight:700;
 }
 
-.date-block{line-height:1.3}
-.date-block .date{font-weight:600}
-.date-block .time{font-size:12px;opacity:.8}
+.status-sent{color:green;font-weight:700}
+.status-pending{color:#888}
 
 .center{
   display:flex;
   justify-content:center;
   align-items:center;
   min-height:100vh;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+.modal-card{
+  background:white;
+  padding:22px;
+  border-radius:14px;
+  max-width:520px;
+  width:90%;
+}
+.modal pre{
+  background:#f5f5f5;
+  padding:12px;
+  border-radius:8px;
+  white-space:pre-wrap;
+}
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:12px;
 }
 </style>
 </head>
@@ -122,7 +135,7 @@ td:nth-child(7){
 <!-- LOGIN -->
 <div id="loginView" class="center">
   <div class="card" style="max-width:420px;text-align:center">
-    <h2>🔐 Admin Login</h2>
+    <h2>🔐 Admin Login</h2><br>
     <input id="email" placeholder="Email"><br><br>
     <input id="password" type="password" placeholder="Password"><br><br>
     <button id="loginBtn">Login</button>
@@ -134,12 +147,19 @@ td:nth-child(7){
 <div id="dashboardView" style="display:none">
   <div class="wrap">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <h2>🎟️ Aarambh Bookings</h2>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+        <h2>🎟 Aarambh Bookings</h2>
         <div>
+          <button id="bulkWhatsAppBtn" class="wa">📤 Send WhatsApp (Bulk)</button>
           <button id="exportBtn">⬇ Export CSV</button>
           <button id="logoutBtn">Logout</button>
         </div>
+      </div>
+
+      <div class="stat">
+        <div class="label">Total Seats (Visible)</div>
+        <div class="value" id="totalQty">0</div>
       </div>
 
       <input id="searchInput" placeholder="Search bookings…">
@@ -148,20 +168,36 @@ td:nth-child(7){
         <table>
           <thead>
             <tr>
+              <th><input type="checkbox" id="selectAll"></th>
               <th>Name</th>
               <th>WhatsApp</th>
-              <th>Seats (Grouped)</th>
+              <th>Seats</th>
               <th>Qty</th>
               <th>Payment ID</th>
               <th>Date</th>
               <th>Time</th>
+              <th>Send</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody id="bookingsBody">
-            <tr><td colspan="7">Loading…</td></tr>
+            <tr><td colspan="10">Loading…</td></tr>
           </tbody>
         </table>
       </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div id="previewModal" class="modal">
+  <div class="modal-card">
+    <h3>WhatsApp Message Preview</h3>
+    <pre id="previewText"></pre>
+    <div class="modal-actions">
+      <button onclick="closePreview()">Cancel</button>
+      <button class="wa" onclick="confirmSend()">Confirm & Open WhatsApp</button>
     </div>
   </div>
 </div>
@@ -169,14 +205,16 @@ td:nth-child(7){
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* CONFIG */
+const POSTER_IMAGE_URL = "https://yourdomain.com/poster.jpg";
+const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 min
 
 const firebaseConfig = {
   apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
   authDomain: "aarambh-ticket-bookings.firebaseapp.com",
   projectId: "aarambh-ticket-bookings",
-  storageBucket: "aarambh-ticket-bookings.firebasestorage.app",
-  messagingSenderId: "269445606104",
   appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
 };
 
@@ -184,93 +222,204 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-onAuthStateChanged(auth, user=>{
+let previewQueue = [];
+let inactivityTimer;
+
+/* AUTH */
+onAuthStateChanged(auth,user=>{
   loginView.style.display = user ? "none" : "flex";
   dashboardView.style.display = user ? "block" : "none";
-  if(user) loadBookings();
+  if(user){
+    resetInactivity();
+    loadBookings();
+  }
 });
 
-loginBtn.onclick = ()=>signInWithEmailAndPassword(auth,email.value,password.value).catch(e=>loginError.textContent=e.message);
-logoutBtn.onclick = ()=>signOut(auth);
+loginBtn.onclick = async ()=>{
+  loginError.textContent="";
+  try{
+    await signInWithEmailAndPassword(auth,email.value.trim(),password.value);
+  }catch(e){
+    loginError.textContent=e.message;
+  }
+};
 
-/* Seat grouping */
-function groupSeats(seats){
-  const groups = {};
+logoutBtn.onclick = () => signOut(auth);
+
+/* AUTO LOGOUT */
+function resetInactivity(){
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(()=>{
+    alert("Logged out due to inactivity.");
+    signOut(auth);
+  }, INACTIVITY_LIMIT);
+}
+
+["mousemove","keydown","scroll","click","touchstart"].forEach(e=>{
+  document.addEventListener(e, resetInactivity, true);
+});
+
+window.addEventListener("beforeunload",()=>signOut(auth));
+
+/* SEAT GROUPING */
+function groupSeats(seatsRaw){
+  if(!seatsRaw) return {text:"—",count:0,raw:""};
+  const seats=seatsRaw.split(",").map(s=>s.trim()).filter(Boolean);
+  const map={};
+
   seats.forEach(s=>{
-    const m = s.match(/R(\d+)C(\d+)/i);
+    const m=s.match(/^([LMR])([A-Z])(\d+)$/i);
     if(!m) return;
-    const r = "R"+m[1];
-    const c = "C"+m[2];
-    groups[r] = groups[r] || [];
-    groups[r].push(c);
+    const key=`${m[1].toUpperCase()}-${m[2].toUpperCase()}`;
+    map[key]=map[key]||[];
+    map[key].push(+m[3]);
   });
-  return groups;
+
+  Object.values(map).forEach(a=>a.sort((x,y)=>x-y));
+
+  const text=Object.entries(map).map(([k,n])=>{
+    let r=[],s=n[0],p=n[0];
+    for(let i=1;i<=n.length;i++){
+      if(n[i]===p+1)p=n[i];
+      else{r.push(s===p?`${s}`:`${s}–${p}`);s=n[i];p=n[i];}
+    }
+    return `${k}: ${r.join(", ")}`;
+  }).join(" | ");
+
+  return {text,count:seats.length,raw:seats.join(", ")};
 }
 
-function formatGroups(groups){
-  return Object.entries(groups)
-    .map(([r,cs])=>`${r}: ${cs.join(", ")}`)
-    .join(" | ");
+/* MESSAGE */
+function buildMessage(name,seats){
+return `Hello ${name} 👋
+
+This is Team Aarambh.
+Your booking for *Drama Night 2.0* is confirmed 🎭
+
+Seats: ${seats}
+Date: 16 Jan 2026
+Time: 6:30 – 8:30 PM
+Venue: Symbiosis College Auditorium
+
+🎟️ Show Poster:
+${POSTER_IMAGE_URL}
+
+See you at the show!
+— Team Aarambh`;
 }
 
+/* LOAD */
 async function loadBookings(){
-  const body=document.getElementById("bookingsBody");
-  body.innerHTML="";
+  bookingsBody.innerHTML="";
+  let total=0;
+
   const snap=await getDocs(collection(db,"bookings"));
+  snap.forEach(d=>{
+    const b=d.data();
+    const seatData=groupSeats(b.seats||"");
+    const sent=b.whatsappSent===true;
+    total+=seatData.count;
 
-  snap.forEach(doc=>{
-    const b=doc.data();
-    const seats = typeof b.seats==="string"
-      ? b.seats.split(",").map(s=>s.trim()).filter(Boolean)
-      : Array.isArray(b.seats)?b.seats:[];
-    const grouped=groupSeats(seats);
-    const groupedText=formatGroups(grouped);
+    bookingsBody.innerHTML+=`
+<tr>
+<td><input type="checkbox" class="rowCheck"
+ ${sent?"disabled":""}
+ data-id="${d.id}"
+ data-name="${b.name||""}"
+ data-phone="${b.whatsapp||""}"
+ data-seats="${seatData.raw}"></td>
 
-    const badges = Object.entries(grouped)
-      .map(([r,cs])=>`<span class="seat-group">${r}: ${cs.join(", ")}</span>`)
-      .join("");
+<td>${b.name||""}</td>
+<td>${b.whatsapp||""}</td>
+<td><span class="seat-badge">${seatData.text}</span></td>
+<td class="qty">${seatData.count}</td>
+<td>${b.payment_id||""}</td>
+<td>${b.timestamp?new Date(b.timestamp).toLocaleDateString():""}</td>
+<td>${b.timestamp?new Date(b.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):""}</td>
 
-    const d = b.timestamp ? new Date(b.timestamp) : null;
+<td>
+<button class="wa-btn" onclick="previewSingle('${d.id}')">
+${sent?"Resend":"Send"}
+</button>
+</td>
 
-    body.innerHTML+=`
-      <tr data-export='${JSON.stringify({
-        name:b.name||"",
-        whatsapp:b.whatsapp||"",
-        seats:groupedText,
-        qty:seats.length,
-        payment:b.payment_id||"",
-        date:d?d.toLocaleDateString():"",
-        time:d?d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):""
-      })}'>
-        <td>${b.name||""}</td>
-        <td>${b.whatsapp||""}</td>
-        <td><div class="seat-groups">${badges}</div></td>
-        <td>${seats.length}</td>
-        <td>${b.payment_id||""}</td>
-        <td>${d?d.toLocaleDateString():""}</td>
-        <td>${d?d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):""}</td>
-      </tr>`;
+<td>${sent?'<span class="status-sent">✔ Sent</span>':'<span class="status-pending">Pending</span>'}</td>
+</tr>`;
   });
+
+  totalQty.textContent=total;
 }
 
-/* Search */
+/* PREVIEW SINGLE */
+window.previewSingle = id => {
+  const cb = document.querySelector(`.rowCheck[data-id="${id}"]`);
+  previewQueue = [{
+    id,
+    phone: cb.dataset.phone,
+    message: buildMessage(cb.dataset.name, cb.dataset.seats)
+  }];
+  previewText.textContent = previewQueue[0].message;
+  previewModal.style.display = "flex";
+};
+
+window.closePreview = () => previewModal.style.display="none";
+
+/* BULK PREVIEW */
+bulkWhatsAppBtn.onclick=()=>{
+  const rows=[...document.querySelectorAll(".rowCheck:checked")];
+  if(!rows.length){
+    alert("No unsent bookings selected.\nBulk resend is disabled.");
+    return;
+  }
+  previewQueue = rows.map(cb=>({
+    id:cb.dataset.id,
+    phone:cb.dataset.phone,
+    message: buildMessage(cb.dataset.name, cb.dataset.seats)
+  }));
+  previewText.textContent = previewQueue.map((m,i)=>`--- ${i+1} ---\n${m.message}`).join("\n\n");
+  previewModal.style.display="flex";
+};
+
+/* CONFIRM SEND */
+window.confirmSend = async ()=>{
+  previewModal.style.display="none";
+  for(const p of previewQueue){
+    window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(p.message)}`,"_blank");
+    await updateDoc(doc(db,"bookings",p.id),{
+      whatsappSent:true,
+      whatsappSentAt:serverTimestamp()
+    });
+    await new Promise(r=>setTimeout(r,400));
+  }
+  previewQueue=[];
+  loadBookings();
+};
+
+/* SEARCH */
 searchInput.onkeyup=()=>{
   const f=searchInput.value.toLowerCase();
+  let t=0;
   [...bookingsBody.rows].forEach(r=>{
-    r.style.display=r.innerText.toLowerCase().includes(f)?"":"none";
+    const show=r.innerText.toLowerCase().includes(f);
+    r.style.display=show?"":"none";
+    if(show){
+      const q=r.querySelector(".qty");
+      if(q)t+=+q.textContent;
+    }
   });
+  totalQty.textContent=t;
 };
 
 /* EXPORT */
 exportBtn.onclick=()=>{
-  let csv=["Name,WhatsApp,Seats,Seat Count,Payment ID,Date,Time"];
+  let csv=["Name,WhatsApp,Seats,Qty,Payment ID,Date,Time,Status"];
   [...bookingsBody.rows].forEach(r=>{
-    const d=JSON.parse(r.dataset.export);
-    csv.push(`"${d.name}","${d.whatsapp}","${d.seats}",${d.qty},"${d.payment}","${d.date}","${d.time}"`);
+    if(r.style.display==="none")return;
+    const c=r.children;
+    csv.push(`"${c[1].innerText}","${c[2].innerText}","${c[3].innerText}",${c[4].innerText},"${c[5].innerText}","${c[6].innerText}","${c[7].innerText}","${c[9].innerText}"`);
   });
-  const blob=new Blob([csv.join("\n")],{type:"text/csv"});
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
+  a.href=URL.createObjectURL(new Blob([csv.join("\n")],{type:"text/csv"}));
   a.download="aarambh-bookings.csv";
   a.click();
 };
