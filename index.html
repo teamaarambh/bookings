@@ -228,27 +228,31 @@
 
         <!-- VENUE + MAP -->
        <div style="position:relative;width:100%;max-width:260px;border-radius:8px;overflow:hidden;">
-  <a href="https://maps.app.goo.gl/27cv4kFw84Zgnjc67"
-     target="_blank"
-     aria-label="Open location in Google Maps"
-     style="display:block;text-decoration:none;">
-     
-    <div style="
+  <button
+    onclick="openDirections()"
+    aria-label="Get directions to venue"
+    style="
       width:100%;
       height:120px;
       background:#d8cbb7;
+      border:none;
       border-radius:8px;
       display:flex;
       align-items:center;
       justify-content:center;
+      flex-direction:column;
+      gap:6px;
+      cursor:pointer;
       color:var(--accent);
       font-weight:700;
-      gap:8px;
     ">
-      📍 Open in Google Maps
-    </div>
-  </a>
+    📍 Get Directions
+    <span style="font-size:12px;font-weight:500;opacity:0.85">
+      Uses your current location
+    </span>
+  </button>
 </div>
+
     </section>
 
     <!-- Center-Aligned Countdown Timer -->
@@ -377,5 +381,47 @@
       });
     })();
   </script>
+  <script>
+function openDirections() {
+  const venueLat = 18.54058;   // Symbiosis College (approx)
+  const venueLng = 73.82961;
+
+  if (!navigator.geolocation) {
+    // Geolocation not supported
+    window.open(
+      `https://www.google.com/maps/dir/?api=1&destination=${venueLat},${venueLng}`,
+      "_blank"
+    );
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      const userLat = position.coords.latitude;
+      const userLng = position.coords.longitude;
+
+      const directionsUrl =
+        `https://www.google.com/maps/dir/?api=1` +
+        `&origin=${userLat},${userLng}` +
+        `&destination=${venueLat},${venueLng}` +
+        `&travelmode=driving`;
+
+      window.open(directionsUrl, "_blank");
+    },
+    error => {
+      // Permission denied / timeout / error
+      window.open(
+        `https://www.google.com/maps/dir/?api=1&destination=${venueLat},${venueLng}`,
+        "_blank"
+      );
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 8000,
+      maximumAge: 0
+    }
+  );
+}
+</script>
 </body>
 </html>
