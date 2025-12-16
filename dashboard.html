@@ -208,7 +208,6 @@ import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from
 import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* CONFIG */
-const POSTER_IMAGE_URL = "https://yourdomain.com/poster.jpg";
 const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 min
 
 const firebaseConfig = {
@@ -290,8 +289,8 @@ function groupSeats(seatsRaw){
 }
 
 /* MESSAGE */
-function buildMessage(name,seats){
-return `Hello ${name} 👋
+function buildMessage(name, seats){
+  return `Hello ${name} 👋
 
 This is Team Aarambh.
 Your booking for *Drama Night 2.0* is confirmed 🎭
@@ -301,13 +300,9 @@ Date: 16 Jan 2026
 Time: 6:30 – 8:30 PM
 Venue: Symbiosis College Auditorium
 
-🎟️ Show Poster:
-${POSTER_IMAGE_URL}
-
 See you at the show!
 — Team Aarambh`;
 }
-
 /* LOAD */
 async function loadBookings(){
   bookingsBody.innerHTML="";
