@@ -12,6 +12,7 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:'Montserrat Alternates',sans-serif;color:var(--text);background:#fff}
 
+/* HEADER */
 header{
   background:var(--accent);color:#fff;
   padding:16px 28px;
@@ -22,6 +23,7 @@ header{
 .brand h1{margin:0;font-family:'Cinzel Decorative',serif;font-size:18px}
 nav a{color:#fff;text-decoration:none;font-weight:600;margin-left:18px}
 
+/* CONTENT */
 .wrap{max-width:1200px;margin:30px auto;padding:0 20px}
 h2{text-align:center;font-family:'Cinzel Decorative',serif}
 
@@ -32,6 +34,21 @@ h2{text-align:center;font-family:'Cinzel Decorative',serif}
 }
 .info{text-align:center;font-weight:700;margin:6px 0}
 
+/* LEGEND */
+.legend{
+  display:flex;justify-content:center;gap:18px;
+  font-size:13px;margin:10px 0 16px
+}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-box{
+  width:14px;height:14px;border-radius:3px;border:1px solid #777
+}
+.premium{background:#f39c12}
+.economy{background:#3498db}
+.booked{background:#7f8c8d}
+.selected{background:#2ecc71}
+
+/* SEAT MAP */
 .seat-map{
   max-width:1100px;margin:auto;overflow-x:auto;
   border:1px solid #ddd;border-radius:6px;padding:12px
@@ -50,6 +67,7 @@ h2{text-align:center;font-family:'Cinzel Decorative',serif}
 .division.middle .row{justify-content:center}
 .division.right .row{justify-content:flex-end}
 
+/* SEAT */
 .seat{
   width:16px;height:16px;border-radius:3px;
   border:1px solid #777;
@@ -57,10 +75,25 @@ h2{text-align:center;font-family:'Cinzel Decorative',serif}
   font-size:9px;font-weight:700;color:#fff;
   cursor:pointer;user-select:none
 }
-.premium{background:#f39c12}
-.economy{background:#3498db}
-.selected{outline:2px solid #27ae60}
+.seat.booked{cursor:not-allowed;opacity:.8}
+.seat.selected{outline:2px solid #27ae60}
 
+/* CONTINUE BUTTON */
+#continueBtn{
+  margin:24px auto 0;
+  display:block;
+  background:#533A5A;
+  color:#fff;
+  border:none;
+  padding:12px 32px;
+  font-size:16px;
+  font-weight:700;
+  border-radius:28px;
+  cursor:pointer;
+}
+#continueBtn:hover{opacity:.95}
+
+/* FOOTER */
 footer{
   margin-top:40px;padding:20px;text-align:center;
   font-size:13px;color:#777;border-top:1px solid #eee
@@ -71,12 +104,11 @@ footer{
 /* ROWS */
 const allRows=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"];
 
-/* LEFT SEATS */
+/* LEFT COUNTS */
 const leftSeatRanges={
   A:3,B:4,C:5,D:6,E:6,F:7,G:7,H:8,I:8,
   J:9,K:9,L:9,M:9,N:9,O:9,P:9,Q:9,R:9,
-  S:9,
-  T:9
+  S:9,T:9
 };
 
 /* MIDDLE COUNTS */
@@ -86,22 +118,42 @@ const middleCount=row=>{
   return mid15.has(row)?15:16;
 };
 
-let selected=[],total=0;
+/* BOOKED (mock) */
+const bookedSeats=new Set(["A1","A2","C5","H10"]);
+
+let selectedSeats=[];
+let totalPrice=0;
+
+function updateInfo(){
+  document.getElementById("selectedSeats").textContent =
+    "Selected Seats: " + (selectedSeats.length?selectedSeats.join(", "):"None");
+  document.getElementById("totalPrice").textContent =
+    "Total Price: ₹" + totalPrice;
+}
 
 function makeSeat(section,row,index,label){
+  const seatId=row+index;
+  const isPremium=(section==="M" && row<="H");
+  const price=isPremium?500:300;
+
   const el=document.createElement("div");
-  el.className="seat "+(section==="M"&&row<="H"?"premium":"economy");
+  el.className="seat "+(isPremium?"premium":"economy");
   el.textContent=label;
+
+  if(bookedSeats.has(seatId)){
+    el.classList.add("booked");
+    return el;
+  }
+
   el.onclick=()=>{
-    const id=row+index;
     if(el.classList.toggle("selected")){
-      selected.push(id);total+=300;
+      selectedSeats.push(seatId);
+      totalPrice+=price;
     }else{
-      selected=selected.filter(x=>x!==id);total-=300;
+      selectedSeats=selectedSeats.filter(s=>s!==seatId);
+      totalPrice-=price;
     }
-    document.getElementById("selectedSeats").textContent=
-      "Selected Seats: "+(selected.length?selected.join(", "):"None");
-    document.getElementById("totalPrice").textContent="Total Price: ₹"+total;
+    updateInfo();
   };
   return el;
 }
@@ -123,9 +175,8 @@ window.onload=()=>{
     let index=1;
     let label;
 
-    /* 🔥 Row T label offset */
     if(row==="T"){
-      label=10+left-1; // 18
+      label=10+left-1; // 10 → 18
     }else{
       label=left*2+mid;
     }
@@ -142,7 +193,7 @@ window.onload=()=>{
 
     const R=document.createElement("div");R.className="division right";
     const rr=document.createElement("div");rr.className="row";
-    if(row!=="T" && row!=="S"){
+    if(row!=="S" && row!=="T"){
       for(let i=0;i<left;i++) rr.appendChild(makeSeat("R",row,index++,label--));
     }
     R.appendChild(rr);
@@ -150,6 +201,22 @@ window.onload=()=>{
     seatRow.append(lbl,L,M,R);
     layout.appendChild(seatRow);
   });
+
+  updateInfo();
+
+  document.getElementById("continueBtn").onclick=()=>{
+    if(selectedSeats.length===0){
+      alert("Please select at least one seat to continue.");
+      return;
+    }
+    sessionStorage.setItem("selectedSeats",JSON.stringify(selectedSeats));
+    sessionStorage.setItem("totalPrice",totalPrice);
+    alert(
+      "Proceeding with:\n"+
+      selectedSeats.join(", ")+"\nTotal: ₹"+totalPrice
+    );
+    // window.location.href="details.html";
+  };
 };
 </script>
 </head>
@@ -172,15 +239,24 @@ window.onload=()=>{
   <h2>Select Your Seats</h2>
   <div class="info" id="selectedSeats">Selected Seats: None</div>
   <div class="info" id="totalPrice">Total Price: ₹0</div>
+
   <div class="stage-banner">🎭 STAGE</div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box premium"></div> Premium (₹500)</div>
+    <div class="legend-item"><div class="legend-box economy"></div> Economy (₹300)</div>
+    <div class="legend-item"><div class="legend-box booked"></div> Booked</div>
+    <div class="legend-item"><div class="legend-box selected"></div> Selected</div>
+  </div>
 
   <div class="seat-map">
     <div id="seatLayout" class="seat-layout"></div>
   </div>
+
+  <button id="continueBtn">Continue</button>
 </div>
 
 <footer>© Team Aarambh — All rights reserved</footer>
 
 </body>
 </html>
-    
