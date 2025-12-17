@@ -220,10 +220,42 @@
 </footer>
 
 <script type="module">
-  const selectedSeats = JSON.parse(sessionStorage.getItem("selectedSeats") || "[]");
-  const totalPrice = parseInt(sessionStorage.getItem("totalPrice") || "0");
+  import { getFirestore, collection, addDoc } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { initializeApp } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-  selectedSeatsSummary.textContent = selectedSeats.join(", ");
+  const firebaseConfig = {
+    apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
+    authDomain: "aarambh-ticket-bookings.firebaseapp.com",
+    databaseURL: "https://aarambh-ticket-bookings-default-rtdb.firebaseio.com",
+    projectId: "aarambh-ticket-bookings",
+    storageBucket: "aarambh-ticket-bookings.firebasestorage.app",
+    messagingSenderId: "269445606104",
+    appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  /* ✅ READ SESSION STORAGE */
+  const selectedSeats = JSON.parse(sessionStorage.getItem("selectedSeats") || "[]");
+  const totalPrice = Number(sessionStorage.getItem("totalPrice") || 0);
+
+  /* ✅ GET DOM ELEMENTS EXPLICITLY */
+  const selectedSeatsSummary = document.getElementById("selectedSeatsSummary");
+  const totalPriceSummary = document.getElementById("totalPriceSummary");
+  const bookingForm = document.getElementById("bookingForm");
+  const userName = document.getElementById("userName");
+  const userWhatsapp = document.getElementById("userWhatsapp");
+  const formStatus = document.getElementById("formStatus");
+  const bookingSuccessPopup = document.getElementById("bookingSuccessPopup");
+
+  /* ✅ DISPLAY VALUES */
+  selectedSeatsSummary.textContent = selectedSeats.length
+    ? selectedSeats.join(", ")
+    : "None";
+
   totalPriceSummary.textContent = "₹" + totalPrice;
 
   bookingForm.addEventListener("submit", async (e) => {
@@ -244,39 +276,31 @@
       name: "Aarambh Theatre",
       description: "Ticket Booking",
       prefill: { name, contact: whatsapp },
+
       handler: async function (response) {
         try {
-          // 🔒 DEFINE PRICE ONCE
-const PRICE_PER_SEAT = 300; // change if needed
+          await addDoc(collection(db, "bookings"), {
+            name,
+            whatsapp,
+            seats: selectedSeats.join(","),
+            amount: totalPrice,
+            payment_id: response.razorpay_payment_id,
+            timestamp: new Date().toISOString(),
+            whatsappSent: false
+          });
 
-// ✅ ENSURE SEATS ARE CLEAN
-const seatArray = selectedSeats
-  .map(s => s.trim())
-  .filter(Boolean);
-
-// ✅ CALCULATE AMOUNT ONCE (LOCKED)
-const amount = seatArray.length * PRICE_PER_SEAT;
-
-// ✅ SAVE BOOKING WITH AMOUNT
-await addDoc(collection(db, "bookings"), {
-  name: name,
-  whatsapp: whatsapp,
-  seats: seatArray.join(","),     // always string
-  amount: amount,                 // 🔥 THIS IS THE KEY CHANGE
-  payment_id: paymentId || "",
-  timestamp: new Date().toISOString(),
-  whatsappSent: false
-});
-
-            }
-          );
           bookingSuccessPopup.style.display = "flex";
           sessionStorage.clear();
         } catch (err) {
           alert("❌ Booking save failed: " + err.message);
         }
       },
-      modal: { ondismiss: () => formStatus.textContent = "Payment cancelled." }
+
+      modal: {
+        ondismiss: () => {
+          formStatus.textContent = "Payment cancelled.";
+        }
+      }
     };
 
     new Razorpay(options).open();
