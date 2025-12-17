@@ -93,7 +93,6 @@ footer{
 </style>
 
 <script type="module">
-/* ================= FIREBASE ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -110,7 +109,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ================= DATA ================= */
+/* DATA */
 const allRows=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"];
 
 const leftSeatRanges={
@@ -129,18 +128,13 @@ let bookedSeats=new Set();
 let selectedSeats=[];
 let totalPrice=0;
 
-/* ================= FIRESTORE READ ================= */
 async function loadBookedSeats(){
-  const snap = await getDocs(collection(db,"bookings"));
-  snap.forEach(doc=>{
-    (doc.data().seats||"")
-      .split(",")
-      .map(s=>s.trim())
-      .forEach(s=>bookedSeats.add(s));
+  const snap=await getDocs(collection(db,"bookings"));
+  snap.forEach(d=>{
+    (d.data().seats||"").split(",").map(s=>s.trim()).forEach(s=>bookedSeats.add(s));
   });
 }
 
-/* ================= UI ================= */
 function updateInfo(){
   document.getElementById("selectedSeats").textContent =
     "Selected Seats: " + (selectedSeats.length?selectedSeats.join(", "):"None");
@@ -175,7 +169,6 @@ function makeSeat(section,row,index,label){
   return el;
 }
 
-/* ================= RENDER ================= */
 async function render(){
   await loadBookedSeats();
   const layout=document.getElementById("seatLayout");
@@ -190,24 +183,25 @@ async function render(){
 
     const left=leftSeatRanges[row]||0;
     const mid=middleCount(row);
+    const totalSeats=left*2+mid;
 
-    let index=1;
-    let label=row==="T"?10+left-1:left*2+mid;
+    let index=totalSeats; // 🔥 RIGHT → LEFT ID
+    let label=row==="T"?10+left-1:totalSeats;
 
     const L=document.createElement("div");L.className="division left";
     const lr=document.createElement("div");lr.className="row";
-    for(let i=0;i<left;i++) lr.appendChild(makeSeat("L",row,index++,label--));
+    for(let i=0;i<left;i++) lr.appendChild(makeSeat("L",row,index--,label--));
     L.appendChild(lr);
 
     const M=document.createElement("div");M.className="division middle";
     const mr=document.createElement("div");mr.className="row";
-    for(let i=0;i<mid;i++) mr.appendChild(makeSeat("M",row,index++,label--));
+    for(let i=0;i<mid;i++) mr.appendChild(makeSeat("M",row,index--,label--));
     M.appendChild(mr);
 
     const R=document.createElement("div");R.className="division right";
     const rr=document.createElement("div");rr.className="row";
     if(row!=="S" && row!=="T"){
-      for(let i=0;i<left;i++) rr.appendChild(makeSeat("R",row,index++,label--));
+      for(let i=0;i<left;i++) rr.appendChild(makeSeat("R",row,index--,label--));
     }
     R.appendChild(rr);
 
@@ -218,8 +212,8 @@ async function render(){
   updateInfo();
 }
 
-/* ================= CONTINUE BUTTON ================= */
-function setupContinue(){
+window.addEventListener("DOMContentLoaded",()=>{
+  render();
   document.getElementById("continueBtn").onclick=()=>{
     if(selectedSeats.length===0){
       alert("Please select at least one seat to continue.");
@@ -229,11 +223,6 @@ function setupContinue(){
     sessionStorage.setItem("totalPrice",totalPrice);
     window.location.href="details.html";
   };
-}
-
-window.addEventListener("DOMContentLoaded",()=>{
-  render();
-  setupContinue();
 });
 </script>
 </head>
