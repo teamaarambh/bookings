@@ -33,11 +33,7 @@ header{
   justify-content:space-between;
 }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
+.brand{display:flex;align-items:center;gap:12px}
 .brand img{height:52px}
 .brand h1{
   margin:0;
@@ -45,17 +41,13 @@ header{
   font-size:18px;
 }
 
-nav{
-  display:flex;
-  gap:18px;
-}
+nav{display:flex;gap:18px}
 nav a{
   color:#fff;
   text-decoration:none;
   font-weight:600;
   font-size:14px;
 }
-nav a:hover{opacity:.85}
 
 /* ===== CONTENT ===== */
 .wrap{
@@ -78,6 +70,30 @@ h2{
   width:260px;
   margin:16px auto;
 }
+
+/* ===== INFO ===== */
+.info{
+  text-align:center;
+  font-weight:700;
+  margin:6px 0;
+}
+
+/* ===== LEGEND ===== */
+.legend{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  font-size:13px;
+  margin:12px 0 18px;
+}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-box{
+  width:14px;height:14px;border-radius:3px;border:1px solid #777;
+}
+.premium{background:#f39c12}
+.economy{background:#3498db}
+.booked{background:#7f8c8d}
+.selected{background:#2ecc71}
 
 /* ===== SEAT MAP ===== */
 .seat-map{
@@ -119,14 +135,12 @@ h2{
 .row{display:flex;gap:4px}
 
 .seat{
-  width:16px;
-  height:16px;
-  border-radius:3px;
+  width:16px;height:16px;border-radius:3px;
   border:1px solid #777;
+  cursor:pointer;
 }
-.premium{background:#f39c12}
-.economy{background:#3498db}
-.booked{background:#7f8c8d}
+.seat.booked{cursor:not-allowed}
+.seat.selected{outline:2px solid #27ae60}
 
 /* ===== FOOTER ===== */
 footer{
@@ -149,16 +163,9 @@ initializeApp({
 });
 const db = getFirestore();
 
-/* ===== ROW DEFINITIONS ===== */
-const allRows = [
-  "A","B","C","D","E","F","G","H","I",
-  "J","K","L","M","N","O","P","Q","R","S","T"
-];
-
-const centerRows = [
-  "A","B","C","D","E","F","G","H","I",
-  "J","K","L","M","N","O","P","Q","R"
-];
+/* ===== DATA ===== */
+const allRows = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"];
+const centerRows = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R"];
 
 const leftSeatRanges = {
   A:[19,21], B:[21,24], C:[21,25], D:[23,28], E:[22,27],
@@ -168,14 +175,16 @@ const leftSeatRanges = {
   K:[25,33], M:[25,33], O:[25,33], Q:[25,33],
   S:[10,18]
 };
-
 const rightSeatRanges = { ...leftSeatRanges, T:[10,18] };
 
 const odd16 = ["A","C","E","G","I","K","M","O","Q"];
 const middleCount = r => odd16.includes(r) ? 16 : 15;
 
 let bookedSeats = new Set();
+let selectedSeats = [];
+let totalPrice = 0;
 
+/* ===== LOAD BOOKED ===== */
 async function loadBooked(){
   const snap = await getDocs(collection(db,"bookings"));
   snap.forEach(d=>{
@@ -183,14 +192,45 @@ async function loadBooked(){
   });
 }
 
-function seat(section,row,num){
+/* ===== CREATE SEAT ===== */
+function createSeat(section,row,num){
   const id = `${section}${row}${num}`;
+  const isPremium = section==="M" && row<="H";
+  const price = isPremium ? 500 : 300;
+
   const el = document.createElement("div");
-  el.className = `seat ${section==="M" && row<="H" ? "premium":"economy"}`;
-  if(bookedSeats.has(id)) el.classList.add("booked");
+  el.className = `seat ${isPremium?"premium":"economy"}`;
+  el.dataset.id = id;
+  el.dataset.price = price;
+
+  if(bookedSeats.has(id)){
+    el.classList.add("booked");
+    return el;
+  }
+
+  el.onclick = () => {
+    if(el.classList.contains("selected")){
+      el.classList.remove("selected");
+      selectedSeats = selectedSeats.filter(s=>s!==id);
+      totalPrice -= price;
+    }else{
+      el.classList.add("selected");
+      selectedSeats.push(id);
+      totalPrice += price;
+    }
+    updateInfo();
+  };
   return el;
 }
 
+function updateInfo(){
+  document.getElementById("selectedSeats").textContent =
+    "Selected Seats: " + (selectedSeats.length ? selectedSeats.join(", ") : "None");
+  document.getElementById("totalPrice").textContent =
+    "Total Price: ₹" + totalPrice;
+}
+
+/* ===== RENDER ===== */
 async function render(){
   await loadBooked();
   const layout = document.getElementById("seatLayout");
@@ -209,7 +249,7 @@ async function render(){
     lrow.className = "row";
     if(leftSeatRanges[row]){
       const [s,e]=leftSeatRanges[row];
-      for(let i=s;i<=e;i++) lrow.appendChild(seat("L",row,i));
+      for(let i=s;i<=e;i++) lrow.appendChild(createSeat("L",row,i));
     }
     L.appendChild(lrow);
 
@@ -218,7 +258,7 @@ async function render(){
     const mrow = document.createElement("div");
     mrow.className = "row";
     if(centerRows.includes(row)){
-      for(let i=1;i<=middleCount(row);i++) mrow.appendChild(seat("M",row,i));
+      for(let i=1;i<=middleCount(row);i++) mrow.appendChild(createSeat("M",row,i));
     }
     M.appendChild(mrow);
 
@@ -228,7 +268,7 @@ async function render(){
     rrow.className = "row";
     if(rightSeatRanges[row]){
       const [s,e]=rightSeatRanges[row];
-      for(let i=s;i<=e;i++) rrow.appendChild(seat("R",row,i));
+      for(let i=s;i<=e;i++) rrow.appendChild(createSeat("R",row,i));
     }
     R.appendChild(rrow);
 
@@ -257,7 +297,18 @@ window.onload = render;
 
 <div class="wrap">
   <h2>Select Your Seats</h2>
+
+  <div class="info" id="selectedSeats">Selected Seats: None</div>
+  <div class="info" id="totalPrice">Total Price: ₹0</div>
+
   <div class="stage-banner">🎭 STAGE</div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box premium"></div> Premium (₹500)</div>
+    <div class="legend-item"><div class="legend-box economy"></div> Economy (₹300)</div>
+    <div class="legend-item"><div class="legend-box booked"></div> Booked</div>
+    <div class="legend-item"><div class="legend-box selected"></div> Selected</div>
+  </div>
 
   <div class="seat-map">
     <div id="seatLayout" class="seat-layout"></div>
