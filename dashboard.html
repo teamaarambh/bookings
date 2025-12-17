@@ -49,6 +49,7 @@ tr:nth-child(even){background:#f6f2eb}
 
 <body>
 
+<!-- LOGIN -->
 <div id="loginView" class="center">
   <div class="card" style="max-width:420px;text-align:center">
     <h2>🔐 Admin Login</h2><br>
@@ -59,6 +60,7 @@ tr:nth-child(even){background:#f6f2eb}
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboardView" style="display:none">
   <div class="wrap">
     <div class="card">
@@ -67,7 +69,6 @@ tr:nth-child(even){background:#f6f2eb}
         <h2>🎟 Aarambh Bookings</h2>
         <div>
           <button id="bulkWhatsAppBtn" class="wa">📤 Send WhatsApp</button>
-          <button id="exportBtn">⬇ Export CSV</button>
           <button id="logoutBtn">Logout</button>
         </div>
       </div>
@@ -105,6 +106,7 @@ tr:nth-child(even){background:#f6f2eb}
   </div>
 </div>
 
+<!-- PREVIEW -->
 <div id="previewModal" class="modal">
   <div class="modal-card">
     <h3>WhatsApp Preview</h3>
@@ -121,6 +123,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* FIREBASE CONFIG */
 const app = initializeApp({
   apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
   authDomain: "aarambh-ticket-bookings.firebaseapp.com",
@@ -133,16 +136,19 @@ const db = getFirestore(app);
 
 let previewQueue=[];
 
+/* AUTH */
 onAuthStateChanged(auth,u=>{
   loginView.style.display=u?"none":"flex";
   dashboardView.style.display=u?"block":"none";
   if(u) loadBookings();
 });
 
-loginBtn.onclick=()=>signInWithEmailAndPassword(auth,email.value,password.value).catch(e=>loginError.textContent=e.message);
+loginBtn.onclick=()=>signInWithEmailAndPassword(auth,email.value,password.value)
+  .catch(e=>loginError.textContent=e.message);
+
 logoutBtn.onclick=()=>signOut(auth);
 
-/* ---------- SEAT HELPERS ---------- */
+/* -------- SEAT HELPERS -------- */
 
 function normalizeSeats(raw){
   return raw.split(",").map(s=>s.trim()).filter(Boolean).sort((a,b)=>{
@@ -154,14 +160,21 @@ function normalizeSeats(raw){
 
 function groupSeatsByRow(seats){
   const map={};
+
   seats.forEach(s=>{
-    const [,r,n]=s.match(/^([A-Z]+)(\d+)$/);
-    map[r]=map[r]||[];
-    map[r].push(+n);
+    const m=s.match(/^([A-Z]+)(\d+)$/);
+    if(!m) return;
+    const [,row,num]=m;
+    map[row]=map[row]||[];
+    map[row].push(+num);
   });
-  return Object.keys(map).sort().map(r=>{
-    const n=map[r].sort((a,b)=>a-b);
-    return `${r}${n[0]}–${r}${n[n.length-1]}`;
+
+  return Object.keys(map).sort().map(row=>{
+    const nums=map[row].sort((a,b)=>a-b);
+    if(nums.length===1){
+      return `${row}${nums[0]}`;
+    }
+    return `${row}${nums[0]}–${row}${nums[nums.length-1]}`;
   }).join(" | ");
 }
 
@@ -180,7 +193,7 @@ https://maps.app.goo.gl/27cv4kFw84Zgnjc67
 — Team Aarambh`;
 }
 
-/* ---------- LOAD BOOKINGS ---------- */
+/* -------- LOAD BOOKINGS -------- */
 
 async function loadBookings(){
   bookingsBody.innerHTML="";
@@ -199,7 +212,12 @@ async function loadBookings(){
 
     bookingsBody.innerHTML+=`
 <tr>
-<td><input type="checkbox" class="rowCheck" data-id="${b.id}" data-name="${b.name}" data-phone="${b.whatsapp}" data-seats="${seats.join(",")}"></td>
+<td><input type="checkbox" class="rowCheck"
+ data-id="${b.id}"
+ data-name="${b.name||""}"
+ data-phone="${b.whatsapp||""}"
+ data-seats="${seats.join(",")}"></td>
+
 <td>${b.name||""}</td>
 <td>${b.whatsapp||""}</td>
 <td><span class="seat-badge">${groupSeatsByRow(seats)}</span></td>
@@ -215,6 +233,8 @@ async function loadBookings(){
   totalQty.textContent=totalT;
   totalAmount.textContent=totalA;
 }
+
+/* -------- WHATSAPP -------- */
 
 window.previewSingle=id=>{
   const cb=document.querySelector(`.rowCheck[data-id="${id}"]`);
