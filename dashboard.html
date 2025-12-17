@@ -83,8 +83,6 @@ tr:nth-child(even){background:#f6f2eb}
         </div>
       </div>
 
-      <input id="searchInput" placeholder="Search…">
-
       <table>
         <thead>
           <tr>
@@ -121,7 +119,7 @@ tr:nth-child(even){background:#f6f2eb}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
@@ -144,20 +142,31 @@ onAuthStateChanged(auth,u=>{
 loginBtn.onclick=()=>signInWithEmailAndPassword(auth,email.value,password.value).catch(e=>loginError.textContent=e.message);
 logoutBtn.onclick=()=>signOut(auth);
 
-/* SEAT SORT + GROUP */
+/* ---------- SEAT HELPERS ---------- */
+
 function normalizeSeats(raw){
-  const list=(Array.isArray(raw)?raw:raw.split(","))
-    .map(s=>s.trim())
-    .filter(Boolean)
-    .sort((a,b)=>{
-      const r=a.match(/([A-Z]+)(\d+)/);
-      const s=b.match(/([A-Z]+)(\d+)/);
-      return r[1]===s[1]?+r[2]-+s[2]:r[1].localeCompare(s[1]);
-    });
-  return list;
+  return raw.split(",").map(s=>s.trim()).filter(Boolean).sort((a,b)=>{
+    const [,r1,n1]=a.match(/^([A-Z]+)(\d+)$/);
+    const [,r2,n2]=b.match(/^([A-Z]+)(\d+)$/);
+    return r1===r2 ? n1-n2 : r1.localeCompare(r2);
+  });
 }
 
-function buildMessage(name,seats){
+function groupSeatsByRow(seats){
+  const map={};
+  seats.forEach(s=>{
+    const [,r,n]=s.match(/^([A-Z]+)(\d+)$/);
+    map[r]=map[r]||[];
+    map[r].push(+n);
+  });
+  return Object.keys(map).sort().map(r=>{
+    const n=map[r].sort((a,b)=>a-b);
+    return `${r}${n[0]}–${r}${n[n.length-1]}`;
+  }).join(" | ");
+}
+
+function buildMessage(name,seatsRaw){
+  const seats=normalizeSeats(seatsRaw);
   return `Hello ${name}
 
 Warm greetings from Team Aarambh!
@@ -171,36 +180,40 @@ https://maps.app.goo.gl/27cv4kFw84Zgnjc67
 — Team Aarambh`;
 }
 
+/* ---------- LOAD BOOKINGS ---------- */
+
 async function loadBookings(){
   bookingsBody.innerHTML="";
-  let qty=0, amt=0;
+  let totalT=0,totalA=0;
 
-  const q=query(collection(db,"bookings"),orderBy("timestamp","desc"));
-  const snap=await getDocs(q);
+  const snap=await getDocs(collection(db,"bookings"));
 
-  snap.forEach(d=>{
-    const b=d.data();
-    const seats=normalizeSeats(b.seats||[]);
-    qty+=seats.length;
-    amt+=Number(b.amount||0);
+  const docs=snap.docs.map(d=>({id:d.id,...d.data()}))
+    .sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
+
+  for(const b of docs){
+    const seats=normalizeSeats(b.seats||"");
+    const qty=seats.length;
+    const amt=Number(b.amount||0);
+    totalT+=qty; totalA+=amt;
 
     bookingsBody.innerHTML+=`
 <tr>
-<td><input type="checkbox" class="rowCheck" data-id="${d.id}" data-phone="${b.whatsapp}" data-name="${b.name}" data-seats="${seats.join(",")}"></td>
+<td><input type="checkbox" class="rowCheck" data-id="${b.id}" data-name="${b.name}" data-phone="${b.whatsapp}" data-seats="${seats.join(",")}"></td>
 <td>${b.name||""}</td>
 <td>${b.whatsapp||""}</td>
-<td><span class="seat-badge">${seats.join(", ")}</span></td>
-<td>${seats.length}</td>
-<td>₹${b.amount||0}</td>
+<td><span class="seat-badge">${groupSeatsByRow(seats)}</span></td>
+<td>${qty}</td>
+<td>₹${amt}</td>
 <td>${b.payment_id||""}</td>
-<td>${b.timestamp?.toDate().toLocaleString()||""}</td>
-<td><button class="wa-btn" onclick="previewSingle('${d.id}')">Send</button></td>
+<td>${b.timestamp?new Date(b.timestamp).toLocaleString():""}</td>
+<td><button class="wa-btn" onclick="previewSingle('${b.id}')">Send</button></td>
 <td>${b.whatsappSent?"✔ Sent":"Pending"}</td>
 </tr>`;
-  });
+  }
 
-  totalQty.textContent=qty;
-  totalAmount.textContent=amt;
+  totalQty.textContent=totalT;
+  totalAmount.textContent=totalA;
 }
 
 window.previewSingle=id=>{
@@ -218,7 +231,10 @@ window.confirmSend=async()=>{
   previewModal.style.display="none";
   for(const p of previewQueue){
     window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(p.message)}`);
-    await updateDoc(doc(db,"bookings",p.id),{whatsappSent:true,whatsappSentAt:serverTimestamp()});
+    await updateDoc(doc(db,"bookings",p.id),{
+      whatsappSent:true,
+      whatsappSentAt:serverTimestamp()
+    });
   }
   loadBookings();
 };
