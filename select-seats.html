@@ -8,276 +8,149 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;600&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --accent:#533A5A;
-  --muted:#EEB885;
-  --text:#533A5A;
-}
-
+:root{--accent:#533A5A;--text:#533A5A}
 *{box-sizing:border-box}
+body{margin:0;font-family:'Montserrat Alternates',sans-serif;color:var(--text);background:#fff}
 
-body{
-  margin:0;
-  font-family:'Montserrat Alternates',sans-serif;
-  color:var(--text);
-  background:#fff;
-}
-
-/* ===== HEADER ===== */
 header{
-  background:var(--accent);
-  color:#fff;
+  background:var(--accent);color:#fff;
   padding:16px 28px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  display:flex;justify-content:space-between;align-items:center
 }
-
 .brand{display:flex;align-items:center;gap:12px}
 .brand img{height:52px}
-.brand h1{
-  margin:0;
-  font-family:'Cinzel Decorative',serif;
-  font-size:18px;
-}
+.brand h1{margin:0;font-family:'Cinzel Decorative',serif;font-size:18px}
+nav a{color:#fff;text-decoration:none;font-weight:600;margin-left:18px}
 
-nav{display:flex;gap:18px}
-nav a{
-  color:#fff;
-  text-decoration:none;
-  font-weight:600;
-  font-size:14px;
-}
-
-/* ===== CONTENT ===== */
-.wrap{
-  max-width:1200px;
-  margin:30px auto;
-  padding:0 20px;
-}
-
-h2{
-  text-align:center;
-  font-family:'Cinzel Decorative',serif;
-}
+.wrap{max-width:1200px;margin:30px auto;padding:0 20px}
+h2{text-align:center;font-family:'Cinzel Decorative',serif}
 
 .stage-banner{
-  background:var(--accent);
-  color:#fff;
-  text-align:center;
-  padding:10px;
-  border-radius:8px;
-  width:260px;
-  margin:16px auto;
+  background:var(--accent);color:#fff;
+  text-align:center;padding:10px;border-radius:8px;
+  width:260px;margin:16px auto
 }
+.info{text-align:center;font-weight:700;margin:6px 0}
 
-/* ===== INFO ===== */
-.info{
-  text-align:center;
-  font-weight:700;
-  margin:6px 0;
-}
-
-/* ===== LEGEND ===== */
-.legend{
-  display:flex;
-  justify-content:center;
-  gap:18px;
-  font-size:13px;
-  margin:12px 0 18px;
-}
-.legend-item{display:flex;align-items:center;gap:6px}
-.legend-box{
-  width:14px;height:14px;border-radius:3px;border:1px solid #777;
-}
-.premium{background:#f39c12}
-.economy{background:#3498db}
-.booked{background:#7f8c8d}
-.selected{background:#2ecc71}
-
-/* ===== SEAT MAP ===== */
 .seat-map{
-  max-width:1100px;
-  margin:auto;
-  overflow-x:auto;
-  border:1px solid #ddd;
-  border-radius:6px;
-  padding:12px;
+  max-width:1100px;margin:auto;overflow-x:auto;
+  border:1px solid #ddd;border-radius:6px;padding:12px
 }
+.seat-layout{display:flex;flex-direction:column;gap:4px;min-width:1050px}
+.seat-row{display:flex;align-items:center;gap:12px}
+.row-label{width:24px;text-align:center;font-weight:700;font-size:13px}
 
-.seat-layout{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-  min-width:1050px;
-}
-
-.seat-row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.row-label{
-  width:24px;
-  text-align:center;
-  font-weight:700;
-  font-size:13px;
-  flex-shrink:0;
-}
-
-/* ===== SECTIONS ===== */
 .division{display:flex}
-.division.left{justify-content:flex-end; min-width:280px}
-.division.middle{justify-content:center; min-width:380px}
-.division.right{justify-content:flex-start; min-width:280px}
+.division.left{justify-content:flex-end;min-width:280px}
+.division.middle{justify-content:center;min-width:380px}
+.division.right{justify-content:flex-start;min-width:280px}
 
 .row{display:flex;gap:4px}
+.division.left .row{justify-content:flex-end}
+.division.middle .row{justify-content:center}
+.division.right .row{justify-content:flex-end}
 
 .seat{
   width:16px;height:16px;border-radius:3px;
   border:1px solid #777;
-  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;color:#fff;
+  cursor:pointer;user-select:none
 }
-.seat.booked{cursor:not-allowed}
-.seat.selected{outline:2px solid #27ae60}
+.premium{background:#f39c12}
+.economy{background:#3498db}
+.selected{outline:2px solid #27ae60}
 
-/* ===== FOOTER ===== */
 footer{
-  margin-top:40px;
-  padding:20px;
-  text-align:center;
-  font-size:13px;
-  color:#777;
-  border-top:1px solid #eee;
+  margin-top:40px;padding:20px;text-align:center;
+  font-size:13px;color:#777;border-top:1px solid #eee
 }
 </style>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script>
+/* ROWS */
+const allRows=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"];
 
-initializeApp({
-  apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
-  projectId: "aarambh-ticket-bookings"
-});
-const db = getFirestore();
-
-/* ===== DATA ===== */
-const allRows = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"];
-const centerRows = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R"];
-
-const leftSeatRanges = {
-  A:[19,21], B:[21,24], C:[21,25], D:[23,28], E:[22,27],
-  F:[24,30], G:[23,29], H:[25,32],
-  I:[26,33],
-  J:[26,34], L:[26,34], N:[26,34], P:[26,34], R:[26,34],
-  K:[25,33], M:[25,33], O:[25,33], Q:[25,33],
-  S:[10,18]
+/* LEFT SEATS */
+const leftSeatRanges={
+  A:3,B:4,C:5,D:6,E:6,F:7,G:7,H:8,I:8,
+  J:9,K:9,L:9,M:9,N:9,O:9,P:9,Q:9,R:9,
+  S:9,
+  T:9
 };
-const rightSeatRanges = { ...leftSeatRanges, T:[10,18] };
 
-const odd16 = ["A","C","E","G","I","K","M","O","Q"];
-const middleCount = r => odd16.includes(r) ? 16 : 15;
+/* MIDDLE COUNTS */
+const mid15=new Set(["A","C","E","G","I","K","M","O","Q"]);
+const middleCount=row=>{
+  if(row==="S" || row==="T") return 0;
+  return mid15.has(row)?15:16;
+};
 
-let bookedSeats = new Set();
-let selectedSeats = [];
-let totalPrice = 0;
+let selected=[],total=0;
 
-/* ===== LOAD BOOKED ===== */
-async function loadBooked(){
-  const snap = await getDocs(collection(db,"bookings"));
-  snap.forEach(d=>{
-    (d.data().seats||"").split(",").forEach(s=>bookedSeats.add(s.trim()));
-  });
-}
-
-/* ===== CREATE SEAT ===== */
-function createSeat(section,row,num){
-  const id = `${section}${row}${num}`;
-  const isPremium = section==="M" && row<="H";
-  const price = isPremium ? 500 : 300;
-
-  const el = document.createElement("div");
-  el.className = `seat ${isPremium?"premium":"economy"}`;
-  el.dataset.id = id;
-  el.dataset.price = price;
-
-  if(bookedSeats.has(id)){
-    el.classList.add("booked");
-    return el;
-  }
-
-  el.onclick = () => {
-    if(el.classList.contains("selected")){
-      el.classList.remove("selected");
-      selectedSeats = selectedSeats.filter(s=>s!==id);
-      totalPrice -= price;
+function makeSeat(section,row,index,label){
+  const el=document.createElement("div");
+  el.className="seat "+(section==="M"&&row<="H"?"premium":"economy");
+  el.textContent=label;
+  el.onclick=()=>{
+    const id=row+index;
+    if(el.classList.toggle("selected")){
+      selected.push(id);total+=300;
     }else{
-      el.classList.add("selected");
-      selectedSeats.push(id);
-      totalPrice += price;
+      selected=selected.filter(x=>x!==id);total-=300;
     }
-    updateInfo();
+    document.getElementById("selectedSeats").textContent=
+      "Selected Seats: "+(selected.length?selected.join(", "):"None");
+    document.getElementById("totalPrice").textContent="Total Price: ₹"+total;
   };
   return el;
 }
 
-function updateInfo(){
-  document.getElementById("selectedSeats").textContent =
-    "Selected Seats: " + (selectedSeats.length ? selectedSeats.join(", ") : "None");
-  document.getElementById("totalPrice").textContent =
-    "Total Price: ₹" + totalPrice;
-}
-
-/* ===== RENDER ===== */
-async function render(){
-  await loadBooked();
-  const layout = document.getElementById("seatLayout");
+window.onload=()=>{
+  const layout=document.getElementById("seatLayout");
 
   allRows.forEach(row=>{
-    const seatRow = document.createElement("div");
-    seatRow.className = "seat-row";
+    const seatRow=document.createElement("div");
+    seatRow.className="seat-row";
 
-    const lbl = document.createElement("div");
-    lbl.className = "row-label";
-    lbl.textContent = row;
+    const lbl=document.createElement("div");
+    lbl.className="row-label";
+    lbl.textContent=row;
 
-    const L = document.createElement("div");
-    L.className = "division left";
-    const lrow = document.createElement("div");
-    lrow.className = "row";
-    if(leftSeatRanges[row]){
-      const [s,e]=leftSeatRanges[row];
-      for(let i=s;i<=e;i++) lrow.appendChild(createSeat("L",row,i));
+    const left=leftSeatRanges[row]||0;
+    const mid=middleCount(row);
+
+    let index=1;
+    let label;
+
+    /* 🔥 Row T label offset */
+    if(row==="T"){
+      label=10+left-1; // 18
+    }else{
+      label=left*2+mid;
     }
-    L.appendChild(lrow);
 
-    const M = document.createElement("div");
-    M.className = "division middle";
-    const mrow = document.createElement("div");
-    mrow.className = "row";
-    if(centerRows.includes(row)){
-      for(let i=1;i<=middleCount(row);i++) mrow.appendChild(createSeat("M",row,i));
-    }
-    M.appendChild(mrow);
+    const L=document.createElement("div");L.className="division left";
+    const lr=document.createElement("div");lr.className="row";
+    for(let i=0;i<left;i++) lr.appendChild(makeSeat("L",row,index++,label--));
+    L.appendChild(lr);
 
-    const R = document.createElement("div");
-    R.className = "division right";
-    const rrow = document.createElement("div");
-    rrow.className = "row";
-    if(rightSeatRanges[row]){
-      const [s,e]=rightSeatRanges[row];
-      for(let i=s;i<=e;i++) rrow.appendChild(createSeat("R",row,i));
+    const M=document.createElement("div");M.className="division middle";
+    const mr=document.createElement("div");mr.className="row";
+    for(let i=0;i<mid;i++) mr.appendChild(makeSeat("M",row,index++,label--));
+    M.appendChild(mr);
+
+    const R=document.createElement("div");R.className="division right";
+    const rr=document.createElement("div");rr.className="row";
+    if(row!=="T" && row!=="S"){
+      for(let i=0;i<left;i++) rr.appendChild(makeSeat("R",row,index++,label--));
     }
-    R.appendChild(rrow);
+    R.appendChild(rr);
 
     seatRow.append(lbl,L,M,R);
     layout.appendChild(seatRow);
   });
-}
-
-window.onload = render;
+};
 </script>
 </head>
 
@@ -285,39 +158,29 @@ window.onload = render;
 
 <header>
   <div class="brand">
-    <img src="AarambhLogo2.png" alt="Aarambh">
+    <img src="AarambhLogo2.png">
     <h1>Aarambh</h1>
   </div>
   <nav>
-    <a href="index.html">Home</a>
-    <a href="team.html">Team</a>
-    <a href="contact.html">Contact</a>
+    <a href="#">Home</a>
+    <a href="#">Team</a>
+    <a href="#">Contact</a>
   </nav>
 </header>
 
 <div class="wrap">
   <h2>Select Your Seats</h2>
-
   <div class="info" id="selectedSeats">Selected Seats: None</div>
   <div class="info" id="totalPrice">Total Price: ₹0</div>
-
   <div class="stage-banner">🎭 STAGE</div>
-
-  <div class="legend">
-    <div class="legend-item"><div class="legend-box premium"></div> Premium (₹500)</div>
-    <div class="legend-item"><div class="legend-box economy"></div> Economy (₹300)</div>
-    <div class="legend-item"><div class="legend-box booked"></div> Booked</div>
-    <div class="legend-item"><div class="legend-box selected"></div> Selected</div>
-  </div>
 
   <div class="seat-map">
     <div id="seatLayout" class="seat-layout"></div>
   </div>
 </div>
 
-<footer>
-  © Team Aarambh — All rights reserved
-</footer>
+<footer>© Team Aarambh — All rights reserved</footer>
 
 </body>
 </html>
+    
