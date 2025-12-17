@@ -12,7 +12,6 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:'Montserrat Alternates',sans-serif;color:var(--text);background:#fff}
 
-/* HEADER */
 header{
   background:var(--accent);color:#fff;
   padding:16px 28px;
@@ -23,7 +22,6 @@ header{
 .brand h1{margin:0;font-family:'Cinzel Decorative',serif;font-size:18px}
 nav a{color:#fff;text-decoration:none;font-weight:600;margin-left:18px}
 
-/* CONTENT */
 .wrap{max-width:1200px;margin:30px auto;padding:0 20px}
 h2{text-align:center;font-family:'Cinzel Decorative',serif}
 
@@ -34,7 +32,6 @@ h2{text-align:center;font-family:'Cinzel Decorative',serif}
 }
 .info{text-align:center;font-weight:700;margin:6px 0}
 
-/* LEGEND */
 .legend{
   display:flex;justify-content:center;gap:18px;
   font-size:13px;margin:10px 0 16px
@@ -48,7 +45,6 @@ h2{text-align:center;font-family:'Cinzel Decorative',serif}
 .booked{background:#7f8c8d}
 .selected{background:#2ecc71}
 
-/* SEAT MAP */
 .seat-map{
   max-width:1100px;margin:auto;overflow-x:auto;
   border:1px solid #ddd;border-radius:6px;padding:12px
@@ -67,7 +63,6 @@ h2{text-align:center;font-family:'Cinzel Decorative',serif}
 .division.middle .row{justify-content:center}
 .division.right .row{justify-content:flex-end}
 
-/* SEAT */
 .seat{
   width:16px;height:16px;border-radius:3px;
   border:1px solid #777;
@@ -78,7 +73,6 @@ h2{text-align:center;font-family:'Cinzel Decorative',serif}
 .seat.booked{cursor:not-allowed;opacity:.8}
 .seat.selected{outline:2px solid #27ae60}
 
-/* CONTINUE BUTTON */
 #continueBtn{
   margin:24px auto 0;
   display:block;
@@ -91,39 +85,62 @@ h2{text-align:center;font-family:'Cinzel Decorative',serif}
   border-radius:28px;
   cursor:pointer;
 }
-#continueBtn:hover{opacity:.95}
 
-/* FOOTER */
 footer{
   margin-top:40px;padding:20px;text-align:center;
   font-size:13px;color:#777;border-top:1px solid #eee
 }
 </style>
 
-<script>
-/* ROWS */
+<script type="module">
+/* ================= FIREBASE ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
+  authDomain: "aarambh-ticket-bookings.firebaseapp.com",
+  databaseURL: "https://aarambh-ticket-bookings-default-rtdb.firebaseio.com",
+  projectId: "aarambh-ticket-bookings",
+  storageBucket: "aarambh-ticket-bookings.firebasestorage.app",
+  messagingSenderId: "269445606104",
+  appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ================= DATA ================= */
 const allRows=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"];
 
-/* LEFT COUNTS */
 const leftSeatRanges={
   A:3,B:4,C:5,D:6,E:6,F:7,G:7,H:8,I:8,
   J:9,K:9,L:9,M:9,N:9,O:9,P:9,Q:9,R:9,
   S:9,T:9
 };
 
-/* MIDDLE COUNTS */
 const mid15=new Set(["A","C","E","G","I","K","M","O","Q"]);
 const middleCount=row=>{
   if(row==="S" || row==="T") return 0;
   return mid15.has(row)?15:16;
 };
 
-/* BOOKED (mock) */
-const bookedSeats=new Set(["A1","A2","C5","H10"]);
-
+let bookedSeats=new Set();
 let selectedSeats=[];
 let totalPrice=0;
 
+/* ================= FIRESTORE READ ================= */
+async function loadBookedSeats(){
+  const snap = await getDocs(collection(db,"bookings"));
+  snap.forEach(doc=>{
+    (doc.data().seats||"")
+      .split(",")
+      .map(s=>s.trim())
+      .forEach(s=>bookedSeats.add(s));
+  });
+}
+
+/* ================= UI ================= */
 function updateInfo(){
   document.getElementById("selectedSeats").textContent =
     "Selected Seats: " + (selectedSeats.length?selectedSeats.join(", "):"None");
@@ -158,7 +175,9 @@ function makeSeat(section,row,index,label){
   return el;
 }
 
-window.onload=()=>{
+/* ================= RENDER ================= */
+async function render(){
+  await loadBookedSeats();
   const layout=document.getElementById("seatLayout");
 
   allRows.forEach(row=>{
@@ -173,13 +192,7 @@ window.onload=()=>{
     const mid=middleCount(row);
 
     let index=1;
-    let label;
-
-    if(row==="T"){
-      label=10+left-1; // 10 → 18
-    }else{
-      label=left*2+mid;
-    }
+    let label=row==="T"?10+left-1:left*2+mid;
 
     const L=document.createElement("div");L.className="division left";
     const lr=document.createElement("div");lr.className="row";
@@ -203,7 +216,10 @@ window.onload=()=>{
   });
 
   updateInfo();
+}
 
+/* ================= CONTINUE BUTTON ================= */
+function setupContinue(){
   document.getElementById("continueBtn").onclick=()=>{
     if(selectedSeats.length===0){
       alert("Please select at least one seat to continue.");
@@ -211,13 +227,14 @@ window.onload=()=>{
     }
     sessionStorage.setItem("selectedSeats",JSON.stringify(selectedSeats));
     sessionStorage.setItem("totalPrice",totalPrice);
-    alert(
-      "Proceeding with:\n"+
-      selectedSeats.join(", ")+"\nTotal: ₹"+totalPrice
-    );
-    // window.location.href="details.html";
+    window.location.href="details.html";
   };
-};
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  render();
+  setupContinue();
+});
 </script>
 </head>
 
@@ -229,9 +246,9 @@ window.onload=()=>{
     <h1>Aarambh</h1>
   </div>
   <nav>
-    <a href="#">Home</a>
-    <a href="#">Team</a>
-    <a href="#">Contact</a>
+    <a href="index.html">Home</a>
+    <a href="team.html">Team</a>
+    <a href="contact.html">Contact</a>
   </nav>
 </header>
 
