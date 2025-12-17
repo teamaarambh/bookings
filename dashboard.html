@@ -259,6 +259,56 @@ window.confirmSend=async()=>{
   loadBookings();
 };
 </script>
+/* -------- CSV EXPORT -------- */
+
+exportBtn.onclick = () => {
+  const rows = [...bookingsBody.querySelectorAll("tr")];
+
+  if (!rows.length) {
+    alert("No data to export");
+    return;
+  }
+
+  const csv = [];
+  csv.push([
+    "Name",
+    "WhatsApp",
+    "Seats",
+    "Qty",
+    "Amount",
+    "Payment ID",
+    "Booking Date",
+    "WhatsApp Status"
+  ].join(","));
+
+  rows.forEach(r => {
+    const cols = r.children;
+
+    const name = cols[1].innerText.trim();
+    const phone = cols[2].innerText.trim();
+    const seats = cols[3].innerText.replace(/,/g, " ").trim();
+    const qty = cols[4].innerText.trim();
+    const amount = cols[5].innerText.replace("₹", "").trim();
+    const paymentId = cols[6].innerText.trim();
+    const date = cols[7].innerText.trim();
+    const status = cols[9].innerText.trim();
+
+    csv.push(
+      `"${name}","${phone}","${seats}",${qty},${amount},"${paymentId}","${date}","${status}"`
+    );
+  });
+
+  const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `aarambh-bookings-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
 
 </body>
 </html>
