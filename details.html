@@ -246,14 +246,28 @@
       prefill: { name, contact: whatsapp },
       handler: async function (response) {
         try {
-          await window.addDoc(
-            window.collection(window.db, "bookings"),
-            {
-              name,
-              whatsapp,
-              seats: selectedSeats.join(","),
-              payment_id: response.razorpay_payment_id,
-              timestamp: new Date().toISOString()
+          // 🔒 DEFINE PRICE ONCE
+const PRICE_PER_SEAT = 300; // change if needed
+
+// ✅ ENSURE SEATS ARE CLEAN
+const seatArray = selectedSeats
+  .map(s => s.trim())
+  .filter(Boolean);
+
+// ✅ CALCULATE AMOUNT ONCE (LOCKED)
+const amount = seatArray.length * PRICE_PER_SEAT;
+
+// ✅ SAVE BOOKING WITH AMOUNT
+await addDoc(collection(db, "bookings"), {
+  name: name,
+  whatsapp: whatsapp,
+  seats: seatArray.join(","),     // always string
+  amount: amount,                 // 🔥 THIS IS THE KEY CHANGE
+  payment_id: paymentId || "",
+  timestamp: new Date().toISOString(),
+  whatsappSent: false
+});
+
             }
           );
           bookingSuccessPopup.style.display = "flex";
