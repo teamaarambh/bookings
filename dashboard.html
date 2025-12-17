@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,188 +15,105 @@
   --text:#533A5A;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:'Montserrat Alternates',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+body{margin:0;font-family:'Montserrat Alternates',sans-serif;background:var(--bg);color:var(--text)}
 .wrap{max-width:1300px;margin:40px auto;padding:0 20px}
 .card{background:var(--card);border-radius:16px;padding:28px}
 h2{font-family:'Cinzel Decorative',serif;margin:0}
 
-input{
-  padding:10px 12px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  width:100%;
-  max-width:420px;
-}
-button{
-  padding:10px 16px;
-  border-radius:10px;
-  border:none;
-  background:var(--accent);
-  color:white;
-  font-weight:700;
-  cursor:pointer;
-}
-button:hover{opacity:.9}
+input{padding:10px;border-radius:8px;border:1px solid #ccc;width:100%;max-width:420px}
+button{padding:10px 16px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:700;cursor:pointer}
 button.wa{background:#25D366}
 
-.stat{background:white;padding:16px 22px;border-radius:12px;margin:20px 0}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:20px 0}
+.stat{background:white;padding:16px 22px;border-radius:12px}
 .stat .label{font-size:12px;opacity:.7}
 .stat .value{font-size:26px;font-weight:800}
 
-.table-wrap{width:100%;overflow-x:auto}
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:20px;
-  background:white;
-  table-layout:fixed;
-}
-th,td{
-  padding:10px;
-  border-bottom:1px solid #ddd;
-  font-size:14px;
-  vertical-align:top;
-}
+table{width:100%;border-collapse:collapse;margin-top:20px;background:white}
+th,td{padding:10px;border-bottom:1px solid #ddd;font-size:14px}
 th{background:var(--accent);color:white;text-align:left}
 tr:nth-child(even){background:#f6f2eb}
 
-td:nth-child(4),
-td:nth-child(6){word-break:break-word}
-
-.seat-badge{
-  background:var(--accent);
-  color:white;
-  padding:4px 8px;
-  border-radius:6px;
-  font-size:12px;
-  display:inline-block;
-}
-
-.wa-btn{
-  background:#25D366;
-  color:white;
-  padding:6px 10px;
-  border-radius:8px;
-  font-size:12px;
-  text-decoration:none;
-  font-weight:700;
-}
-
+.seat-badge{background:var(--accent);color:white;padding:4px 8px;border-radius:6px;font-size:12px}
+.wa-btn{background:#25D366;color:white;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700}
 .status-sent{color:green;font-weight:700}
 .status-pending{color:#888}
 
-.center{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-}
-
-/* MODAL */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
-}
-.modal-card{
-  background:white;
-  padding:22px;
-  border-radius:14px;
-  max-width:520px;
-  width:90%;
-}
-.modal pre{
-  background:#f5f5f5;
-  padding:12px;
-  border-radius:8px;
-  white-space:pre-wrap;
-}
-.modal-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  margin-top:12px;
-}
+.center{display:flex;justify-content:center;align-items:center;min-height:100vh}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999}
+.modal-card{background:white;padding:22px;border-radius:14px;max-width:520px;width:90%}
+.modal pre{background:#f5f5f5;padding:12px;border-radius:8px;white-space:pre-wrap}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div id="loginView" class="center">
   <div class="card" style="max-width:420px;text-align:center">
     <h2>🔐 Admin Login</h2><br>
     <input id="email" placeholder="Email"><br><br>
     <input id="password" type="password" placeholder="Password"><br><br>
     <button id="loginBtn">Login</button>
-    <p id="loginError" style="color:#c0392b;margin-top:10px"></p>
+    <p id="loginError" style="color:#c0392b"></p>
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dashboardView" style="display:none">
   <div class="wrap">
     <div class="card">
 
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px">
         <h2>🎟 Aarambh Bookings</h2>
         <div>
-          <button id="bulkWhatsAppBtn" class="wa">📤 Send WhatsApp (Bulk)</button>
+          <button id="bulkWhatsAppBtn" class="wa">📤 Send WhatsApp</button>
           <button id="exportBtn">⬇ Export CSV</button>
           <button id="logoutBtn">Logout</button>
         </div>
       </div>
 
-      <div class="stat">
-        <div class="label">Total Seats (Visible)</div>
-        <div class="value" id="totalQty">0</div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="label">Total Tickets</div>
+          <div class="value" id="totalQty">0</div>
+        </div>
+        <div class="stat">
+          <div class="label">Total Amount</div>
+          <div class="value">₹<span id="totalAmount">0</span></div>
+        </div>
       </div>
 
-      <input id="searchInput" placeholder="Search bookings…">
+      <input id="searchInput" placeholder="Search…">
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th><input type="checkbox" id="selectAll"></th>
-              <th>Name</th>
-              <th>WhatsApp</th>
-              <th>Seats</th>
-              <th>Qty</th>
-              <th>Payment ID</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Send</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="bookingsBody">
-            <tr><td colspan="10">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>WhatsApp</th>
+            <th>Seats</th>
+            <th>Qty</th>
+            <th>Amount</th>
+            <th>Payment ID</th>
+            <th>Date</th>
+            <th>Send</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsBody"></tbody>
+      </table>
 
     </div>
   </div>
 </div>
 
-<!-- PREVIEW MODAL -->
 <div id="previewModal" class="modal">
   <div class="modal-card">
-    <h3>WhatsApp Message Preview</h3>
+    <h3>WhatsApp Preview</h3>
     <pre id="previewText"></pre>
     <div class="modal-actions">
-      <button onclick="closePreview()">Cancel</button>
-      <button class="wa" onclick="confirmSend()">Confirm & Open WhatsApp</button>
+      <button onclick="previewModal.style.display='none'">Cancel</button>
+      <button class="wa" onclick="confirmSend()">Confirm</button>
     </div>
   </div>
 </div>
@@ -205,230 +121,106 @@ td:nth-child(6){word-break:break-word}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* CONFIG */
-const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 min
-
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
   authDomain: "aarambh-ticket-bookings.firebaseapp.com",
   projectId: "aarambh-ticket-bookings",
   appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
-};
+});
 
-const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let previewQueue = [];
-let inactivityTimer;
+let previewQueue=[];
 
-/* AUTH */
-onAuthStateChanged(auth,user=>{
-  loginView.style.display = user ? "none" : "flex";
-  dashboardView.style.display = user ? "block" : "none";
-  if(user){
-    resetInactivity();
-    loadBookings();
-  }
+onAuthStateChanged(auth,u=>{
+  loginView.style.display=u?"none":"flex";
+  dashboardView.style.display=u?"block":"none";
+  if(u) loadBookings();
 });
 
-loginBtn.onclick = async ()=>{
-  loginError.textContent="";
-  try{
-    await signInWithEmailAndPassword(auth,email.value.trim(),password.value);
-  }catch(e){
-    loginError.textContent=e.message;
-  }
-};
+loginBtn.onclick=()=>signInWithEmailAndPassword(auth,email.value,password.value).catch(e=>loginError.textContent=e.message);
+logoutBtn.onclick=()=>signOut(auth);
 
-logoutBtn.onclick = () => signOut(auth);
-
-/* AUTO LOGOUT */
-function resetInactivity(){
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(()=>{
-    alert("Logged out due to inactivity.");
-    signOut(auth);
-  }, INACTIVITY_LIMIT);
+/* SEAT SORT + GROUP */
+function normalizeSeats(raw){
+  const list=(Array.isArray(raw)?raw:raw.split(","))
+    .map(s=>s.trim())
+    .filter(Boolean)
+    .sort((a,b)=>{
+      const r=a.match(/([A-Z]+)(\d+)/);
+      const s=b.match(/([A-Z]+)(\d+)/);
+      return r[1]===s[1]?+r[2]-+s[2]:r[1].localeCompare(s[1]);
+    });
+  return list;
 }
 
-["mousemove","keydown","scroll","click","touchstart"].forEach(e=>{
-  document.addEventListener(e, resetInactivity, true);
-});
-
-window.addEventListener("beforeunload",()=>signOut(auth));
-
-/* SEAT GROUPING */
-function groupSeats(seatsRaw){
-  if(!seatsRaw) return {text:"—",count:0,raw:""};
-  const seats=seatsRaw.split(",").map(s=>s.trim()).filter(Boolean);
-  const map={};
-
-  seats.forEach(s=>{
-    const m=s.match(/^([LMR])([A-Z])(\d+)$/i);
-    if(!m) return;
-    const key=`${m[1].toUpperCase()}-${m[2].toUpperCase()}`;
-    map[key]=map[key]||[];
-    map[key].push(+m[3]);
-  });
-
-  Object.values(map).forEach(a=>a.sort((x,y)=>x-y));
-
-  const text=Object.entries(map).map(([k,n])=>{
-    let r=[],s=n[0],p=n[0];
-    for(let i=1;i<=n.length;i++){
-      if(n[i]===p+1)p=n[i];
-      else{r.push(s===p?`${s}`:`${s}–${p}`);s=n[i];p=n[i];}
-    }
-    return `${k}: ${r.join(", ")}`;
-  }).join(" | ");
-
-  return {text,count:seats.length,raw:seats.join(", ")};
-}
-
-/* MESSAGE */
-function buildMessage(name, seatsRaw) {
-  // Normalize seats
-  const seatList = seatsRaw
-    .split(",")
-    .map(s => s.trim())
-    .filter(Boolean);
-
-  const seatCount = seatList.length;
-  const seatLabel = seatCount === 1 ? "Seat" : "Seats";
-
+function buildMessage(name,seats){
   return `Hello ${name}
 
 Warm greetings from Team Aarambh!
 
-We’re delighted to welcome you to *Drama Night 2.0*
-Your place is reserved, and we can’t wait to have you with us.
-
-${seatLabel}: ${seatList.join(", ")}
+Seats: ${seats.join(", ")}
 Date: 16 Jan 2026
 Time: 6:30 – 8:30 PM
-Venue: Symbiosis College Auditorium  
+Venue: Symbiosis College Auditorium
 https://maps.app.goo.gl/27cv4kFw84Zgnjc67
 
-Looking forward to hosting you.
 — Team Aarambh`;
 }
-/* LOAD */
+
 async function loadBookings(){
   bookingsBody.innerHTML="";
-  let total=0;
+  let qty=0, amt=0;
 
-  const snap=await getDocs(collection(db,"bookings"));
+  const q=query(collection(db,"bookings"),orderBy("timestamp","desc"));
+  const snap=await getDocs(q);
+
   snap.forEach(d=>{
     const b=d.data();
-    const seatData=groupSeats(b.seats||"");
-    const sent=b.whatsappSent===true;
-    total+=seatData.count;
+    const seats=normalizeSeats(b.seats||[]);
+    qty+=seats.length;
+    amt+=Number(b.amount||0);
 
     bookingsBody.innerHTML+=`
 <tr>
-<td><input type="checkbox" class="rowCheck"
- ${sent?"disabled":""}
- data-id="${d.id}"
- data-name="${b.name||""}"
- data-phone="${b.whatsapp||""}"
- data-seats="${seatData.raw}"></td>
-
+<td><input type="checkbox" class="rowCheck" data-id="${d.id}" data-phone="${b.whatsapp}" data-name="${b.name}" data-seats="${seats.join(",")}"></td>
 <td>${b.name||""}</td>
 <td>${b.whatsapp||""}</td>
-<td><span class="seat-badge">${seatData.text}</span></td>
-<td class="qty">${seatData.count}</td>
+<td><span class="seat-badge">${seats.join(", ")}</span></td>
+<td>${seats.length}</td>
+<td>₹${b.amount||0}</td>
 <td>${b.payment_id||""}</td>
-<td>${b.timestamp?new Date(b.timestamp).toLocaleDateString():""}</td>
-<td>${b.timestamp?new Date(b.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):""}</td>
-
-<td>
-<button class="wa-btn" onclick="previewSingle('${d.id}')">
-${sent?"Resend":"Send"}
-</button>
-</td>
-
-<td>${sent?'<span class="status-sent">✔ Sent</span>':'<span class="status-pending">Pending</span>'}</td>
+<td>${b.timestamp?.toDate().toLocaleString()||""}</td>
+<td><button class="wa-btn" onclick="previewSingle('${d.id}')">Send</button></td>
+<td>${b.whatsappSent?"✔ Sent":"Pending"}</td>
 </tr>`;
   });
 
-  totalQty.textContent=total;
+  totalQty.textContent=qty;
+  totalAmount.textContent=amt;
 }
 
-/* PREVIEW SINGLE */
-window.previewSingle = id => {
-  const cb = document.querySelector(`.rowCheck[data-id="${id}"]`);
-  previewQueue = [{
+window.previewSingle=id=>{
+  const cb=document.querySelector(`.rowCheck[data-id="${id}"]`);
+  previewQueue=[{
     id,
-    phone: cb.dataset.phone,
-    message: buildMessage(cb.dataset.name, cb.dataset.seats)
-  }];
-  previewText.textContent = previewQueue[0].message;
-  previewModal.style.display = "flex";
-};
-
-window.closePreview = () => previewModal.style.display="none";
-
-/* BULK PREVIEW */
-bulkWhatsAppBtn.onclick=()=>{
-  const rows=[...document.querySelectorAll(".rowCheck:checked")];
-  if(!rows.length){
-    alert("No unsent bookings selected.\nBulk resend is disabled.");
-    return;
-  }
-  previewQueue = rows.map(cb=>({
-    id:cb.dataset.id,
     phone:cb.dataset.phone,
-    message: buildMessage(cb.dataset.name, cb.dataset.seats)
-  }));
-  previewText.textContent = previewQueue.map((m,i)=>`--- ${i+1} ---\n${m.message}`).join("\n\n");
+    message:buildMessage(cb.dataset.name,cb.dataset.seats.split(","))
+  }];
+  previewText.textContent=previewQueue[0].message;
   previewModal.style.display="flex";
 };
 
-/* CONFIRM SEND */
-window.confirmSend = async ()=>{
+window.confirmSend=async()=>{
   previewModal.style.display="none";
   for(const p of previewQueue){
-    window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(p.message)}`,"_blank");
-    await updateDoc(doc(db,"bookings",p.id),{
-      whatsappSent:true,
-      whatsappSentAt:serverTimestamp()
-    });
-    await new Promise(r=>setTimeout(r,400));
+    window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(p.message)}`);
+    await updateDoc(doc(db,"bookings",p.id),{whatsappSent:true,whatsappSentAt:serverTimestamp()});
   }
-  previewQueue=[];
   loadBookings();
-};
-
-/* SEARCH */
-searchInput.onkeyup=()=>{
-  const f=searchInput.value.toLowerCase();
-  let t=0;
-  [...bookingsBody.rows].forEach(r=>{
-    const show=r.innerText.toLowerCase().includes(f);
-    r.style.display=show?"":"none";
-    if(show){
-      const q=r.querySelector(".qty");
-      if(q)t+=+q.textContent;
-    }
-  });
-  totalQty.textContent=t;
-};
-
-/* EXPORT */
-exportBtn.onclick=()=>{
-  let csv=["Name,WhatsApp,Seats,Qty,Payment ID,Date,Time,Status"];
-  [...bookingsBody.rows].forEach(r=>{
-    if(r.style.display==="none")return;
-    const c=r.children;
-    csv.push(`"${c[1].innerText}","${c[2].innerText}","${c[3].innerText}",${c[4].innerText},"${c[5].innerText}","${c[6].innerText}","${c[7].innerText}","${c[9].innerText}"`);
-  });
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([csv.join("\n")],{type:"text/csv"}));
-  a.download="aarambh-bookings.csv";
-  a.click();
 };
 </script>
 
