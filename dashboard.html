@@ -46,7 +46,7 @@ tr:nth-child(even){background:#f6f2eb}
 <div id="loginView" class="center">
   <div class="card" style="max-width:420px;text-align:center">
     <h2>🔐 Admin Login</h2><br>
-    <input id="email" placeholder="Email"><br><br>
+    <input id="email" type="email" placeholder="Email"><br><br>
     <input id="password" type="password" placeholder="Password"><br><br>
     <button id="loginBtn">Login</button>
     <p id="loginError" style="color:#c0392b"></p>
@@ -60,7 +60,6 @@ tr:nth-child(even){background:#f6f2eb}
       <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px">
         <h2>🎟 Aarambh Bookings</h2>
         <div>
-          <button id="bulkWhatsAppBtn" class="wa">📤 Send WhatsApp</button>
           <button id="exportBtn">⬇ Export CSV</button>
           <button id="logoutBtn">Logout</button>
         </div>
@@ -115,31 +114,35 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* FIREBASE CONFIG */
+/* Firebase */
 const app = initializeApp({
   apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
   authDomain: "aarambh-ticket-bookings.firebaseapp.com",
   projectId: "aarambh-ticket-bookings",
   appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
 });
-
 const auth = getAuth(app);
 const db = getFirestore(app);
-let previewQueue=[];
 
-/* AUTH */
-onAuthStateChanged(auth,u=>{
-  loginView.style.display=u?"none":"flex";
-  dashboardView.style.display=u?"block":"none";
-  if(u) loadBookings();
+let previewQueue = [];
+
+/* Auth */
+onAuthStateChanged(auth, u => {
+  loginView.style.display = u ? "none" : "flex";
+  dashboardView.style.display = u ? "block" : "none";
+  if (u) loadBookings();
 });
 
-loginBtn.onclick=()=>signInWithEmailAndPassword(auth,email.value,password.value)
-.catch(e=>loginError.textContent=e.message);
+loginBtn.onclick = () => {
+  const e = email.value.trim();
+  const p = password.value;
+  if (!e || !p) return loginError.textContent = "Email and password required";
+  signInWithEmailAndPassword(auth, e, p)
+    .catch(() => loginError.textContent = "Invalid credentials");
+};
+logoutBtn.onclick = () => signOut(auth);
 
-logoutBtn.onclick=()=>signOut(auth);
-
-/* -------- SEAT HELPERS (UNCHANGED) -------- */
+/* Seat helpers */
 function normalizeSeats(raw){
   return raw.split(",").map(s=>s.trim()).filter(Boolean).sort((a,b)=>{
     const [,r1,n1]=a.match(/^([A-Z]+)(\d+)$/);
@@ -147,7 +150,6 @@ function normalizeSeats(raw){
     return r1===r2 ? n1-n2 : r1.localeCompare(r2);
   });
 }
-
 function groupSeatsByRow(seats){
   const map={};
   seats.forEach(s=>{
@@ -155,19 +157,16 @@ function groupSeatsByRow(seats){
     map[row]=map[row]||[];
     map[row].push(+num);
   });
-  return Object.keys(map).sort().map(row=>{
-    const nums=map[row].sort((a,b)=>a-b);
-    return nums.length===1
-      ? `${row}${nums[0]}`
-      : `${row}${nums[0]}–${row}${nums[nums.length-1]}`;
+  return Object.keys(map).sort().map(r=>{
+    const n=map[r].sort((a,b)=>a-b);
+    return n.length===1 ? `${r}${n[0]}` : `${r}${n[0]}–${r}${n[n.length-1]}`;
   }).join(" | ");
 }
 
-/* -------- WHATSAPP MESSAGE (UPDATED TEXT ONLY) -------- */
+/* WhatsApp message */
 function buildMessage(name,seatsRaw){
-  const seats = normalizeSeats(seatsRaw);
-  const seatLabel = seats.length === 1 ? "Seat" : "Seats";
-
+  const seats=normalizeSeats(seatsRaw);
+  const label=seats.length===1?"Seat":"Seats";
   return `Hello ${name}
 
 Warm greetings from Team Aarambh!
@@ -175,7 +174,7 @@ Warm greetings from Team Aarambh!
 We’re delighted to welcome you to *Drama Night 2.0*
 Your place is reserved, and we can’t wait to have you with us.
 
-${seatLabel}: ${seats.join(", ")}
+${label}: ${seats.join(", ")}
 Date: 16 Jan 2026
 Time: 6:30 – 8:30 PM
 Venue: Symbiosis College Auditorium
@@ -185,14 +184,13 @@ Looking forward to hosting you.
 — Team Aarambh`;
 }
 
-/* -------- LOAD BOOKINGS (UNCHANGED) -------- */
+/* Load bookings */
 async function loadBookings(){
   bookingsBody.innerHTML="";
   let totalT=0,totalA=0;
 
   const snap=await getDocs(collection(db,"bookings"));
-  const docs=snap.docs
-    .map(d=>({id:d.id,...d.data()}))
+  const docs=snap.docs.map(d=>({id:d.id,...d.data()}))
     .sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
 
   for(const b of docs){
@@ -201,32 +199,31 @@ async function loadBookings(){
     totalA+=Number(b.amount||0);
 
     bookingsBody.innerHTML+=`
-    <tr>
-      <td><input type="checkbox" class="rowCheck"
-        data-id="${b.id}"
-        data-name="${b.name||""}"
-        data-phone="${b.whatsapp||""}"
-        data-seats="${b.seats||""}">
-      </td>
-      <td>${b.name||""}</td>
-      <td>${b.whatsapp||""}</td>
-      <td><span class="seat-badge">${groupSeatsByRow(seats)}</span></td>
-      <td>${seats.length}</td>
-      <td>₹${b.amount||0}</td>
-      <td>${b.payment_id||""}</td>
-      <td>${b.timestamp?new Date(b.timestamp).toLocaleString():""}</td>
-      <td><button class="wa-btn" onclick="previewSingle('${b.id}')">Send</button></td>
-      <td>${b.whatsappSent?"✔ Sent":"Pending"}</td>
-    </tr>`;
+      <tr>
+        <td><input type="checkbox" class="rowCheck"
+          data-id="${b.id}"
+          data-name="${b.name}"
+          data-phone="${b.whatsapp}"
+          data-seats="${b.seats}">
+        </td>
+        <td>${b.name}</td>
+        <td>${b.whatsapp}</td>
+        <td><span class="seat-badge">${groupSeatsByRow(seats)}</span></td>
+        <td>${seats.length}</td>
+        <td>₹${b.amount||0}</td>
+        <td>${b.payment_id||""}</td>
+        <td>${b.timestamp?new Date(b.timestamp).toLocaleString():""}</td>
+        <td><button class="wa-btn" onclick="previewSingle('${b.id}')">Send</button></td>
+        <td>${b.whatsappSent?"✔ Sent":"Pending"}</td>
+      </tr>`;
   }
-
   totalQty.textContent=totalT;
   totalAmount.textContent=totalA;
 }
 
-/* -------- WHATSAPP SEND (FIXED) -------- */
+/* WhatsApp send */
 window.previewSingle=id=>{
-  const cb=document.querySelector(\`.rowCheck[data-id="\${id}"]\`);
+  const cb=document.querySelector(`.rowCheck[data-id="${id}"]`);
   previewQueue=[{
     id,
     phone:cb.dataset.phone.replace(/\D/g,""),
@@ -235,14 +232,10 @@ window.previewSingle=id=>{
   previewText.textContent=previewQueue[0].message;
   previewModal.style.display="flex";
 };
-
 window.confirmSend=async()=>{
   previewModal.style.display="none";
   const p=previewQueue[0];
-  window.open(
-    \`https://wa.me/91\${p.phone}?text=\${encodeURIComponent(p.message)}\`,
-    "_blank"
-  );
+  window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(p.message)}`,"_blank");
   await updateDoc(doc(db,"bookings",p.id),{
     whatsappSent:true,
     whatsappSentAt:serverTimestamp()
