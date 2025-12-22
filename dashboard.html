@@ -19,19 +19,14 @@ body{margin:0;font-family:'Montserrat Alternates',sans-serif;background:var(--bg
 .wrap{max-width:1300px;margin:40px auto;padding:0 20px}
 .card{background:var(--card);border-radius:16px;padding:28px}
 h2{font-family:'Cinzel Decorative',serif;margin:0}
-input{padding:10px;border-radius:8px;border:1px solid #ccc;width:100%;max-width:420px}
-button{padding:10px 16px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+input{padding:8px;border-radius:8px;border:1px solid #ccc}
+button{padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:700;cursor:pointer}
 button.wa{background:#25D366}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:20px 0}
-.stat{background:white;padding:16px 22px;border-radius:12px}
-.stat .label{font-size:12px;opacity:.7}
-.stat .value{font-size:26px;font-weight:800}
-
+.stat{background:white;padding:16px;border-radius:12px}
 table{width:100%;border-collapse:collapse;margin-top:20px;background:white}
 th,td{padding:10px;border-bottom:1px solid #ddd;font-size:14px;vertical-align:top}
-th{background:var(--accent);color:white;text-align:left}
-tr:nth-child(even){background:#f6f2eb}
-
+th{background:var(--accent);color:white}
 .seat-badge{
   background:var(--accent);
   color:white;
@@ -39,11 +34,8 @@ tr:nth-child(even){background:#f6f2eb}
   border-radius:6px;
   font-size:12px;
   display:inline-block;
-  max-width:240px;
-  white-space:normal;
-  line-height:1.4;
+  white-space:nowrap;
 }
-
 .wa-btn{
   background:#25D366;
   color:white;
@@ -52,7 +44,6 @@ tr:nth-child(even){background:#f6f2eb}
   font-size:12px;
   font-weight:700;
 }
-
 .center{display:flex;justify-content:center;align-items:center;min-height:100vh}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999}
 .modal-card{background:white;padding:22px;border-radius:14px;max-width:520px;width:90%}
@@ -79,7 +70,7 @@ tr:nth-child(even){background:#f6f2eb}
   <div class="wrap">
     <div class="card">
 
-      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
         <h2>🎟 Aarambh Bookings</h2>
         <div>
           <button id="exportBtn">⬇ Export CSV</button>
@@ -87,16 +78,16 @@ tr:nth-child(even){background:#f6f2eb}
         </div>
       </div>
 
-      <input id="searchInput" placeholder="Search bookings..." style="max-width:260px;margin-top:14px">
+      <input id="searchInput" placeholder="Search…" style="margin-top:12px;max-width:260px">
 
       <div class="stat-grid">
         <div class="stat">
-          <div class="label">Total Tickets</div>
-          <div class="value" id="totalQty">0</div>
+          <div>Total Tickets</div>
+          <div style="font-size:26px;font-weight:800" id="totalQty">0</div>
         </div>
         <div class="stat">
-          <div class="label">Total Amount</div>
-          <div class="value">₹<span id="totalAmount">0</span></div>
+          <div>Total Amount</div>
+          <div style="font-size:26px;font-weight:800">₹<span id="totalAmount">0</span></div>
         </div>
       </div>
 
@@ -123,7 +114,7 @@ tr:nth-child(even){background:#f6f2eb}
   </div>
 </div>
 
-<!-- PREVIEW -->
+<!-- WHATSAPP PREVIEW -->
 <div id="previewModal" class="modal">
   <div class="modal-card">
     <h3>WhatsApp Preview</h3>
@@ -150,49 +141,61 @@ const app = initializeApp({
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let previewQueue = [];
-
-/* Auth */
-onAuthStateChanged(auth, u => {
+onAuthStateChanged(auth,u=>{
   loginView.style.display = u ? "none" : "flex";
   dashboardView.style.display = u ? "block" : "none";
-  if (u) loadBookings();
+  if(u) loadBookings();
 });
 
-loginBtn.onclick = () => {
-  const e = email.value.trim();
-  const p = password.value;
-  if (!e || !p) return loginError.textContent = "Email and password required";
-  signInWithEmailAndPassword(auth, e, p)
-    .catch(() => loginError.textContent = "Invalid credentials");
+loginBtn.onclick=()=>{
+  signInWithEmailAndPassword(auth,email.value,password.value)
+    .catch(()=>loginError.textContent="Invalid credentials");
 };
-logoutBtn.onclick = () => signOut(auth);
+logoutBtn.onclick=()=>signOut(auth);
 
 /* Seat helpers */
 function normalizeSeats(raw){
-  return raw.split(",").map(s=>s.trim()).filter(Boolean).sort((a,b)=>{
-    const [,r1,n1]=a.match(/^([A-Z]+)(\d+)$/);
-    const [,r2,n2]=b.match(/^([A-Z]+)(\d+)$/);
-    return r1===r2 ? n1-n2 : r1.localeCompare(r2);
-  });
+  return raw.split(",").map(s=>s.trim()).filter(Boolean).sort();
 }
-function groupSeatsByRow(seats){
-  const map={};
+function groupSeatsDashboard(seats){
+  const rows={};
   seats.forEach(s=>{
-    const [,row,num]=s.match(/^([A-Z]+)(\d+)$/);
-    map[row]=map[row]||[];
-    map[row].push(+num);
+    const r=s.match(/^([A-Z]+)(\d+)$/);
+    if(!r) return;
+    rows[r[1]] ??= [];
+    rows[r[1]].push(+r[2]);
   });
-  return Object.keys(map).sort().map(r=>{
-    const n=map[r].sort((a,b)=>a-b);
+  return Object.keys(rows).sort().map(r=>{
+    const n=rows[r].sort((a,b)=>a-b);
     return n.length===1 ? `${r}${n[0]}` : `${r}${n[0]}–${r}${n[n.length-1]}`;
   }).join(" | ");
+}
+
+/* WhatsApp message — INDIVIDUAL SEATS ONLY */
+function buildMessage(name,seatsRaw){
+  const seats=normalizeSeats(seatsRaw);
+  const label=seats.length===1?"Seat":"Seats";
+  return `Hello ${name}
+
+Warm greetings from Team Aarambh!
+
+We’re delighted to welcome you to *Drama Night 2.0*
+Your place is reserved, and we can’t wait to have you with us.
+
+${label}: ${seats.join(", ")}
+Date: 16 Jan 2026
+Time: 6:30 – 8:30 PM
+Venue: Symbiosis College Auditorium  
+https://maps.app.goo.gl/27cv4kFw84Zgnjc67
+
+Looking forward to hosting you.
+— Team Aarambh`;
 }
 
 /* Load bookings */
 async function loadBookings(){
   bookingsBody.innerHTML="";
-  let totalT=0,totalA=0;
+  let tq=0, ta=0;
 
   const snap=await getDocs(collection(db,"bookings"));
   const docs=snap.docs.map(d=>({id:d.id,...d.data()}))
@@ -200,57 +203,54 @@ async function loadBookings(){
 
   for(const b of docs){
     const seats=normalizeSeats(b.seats||"");
-    totalT+=seats.length;
-    totalA+=Number(b.amount||0);
+    tq+=seats.length;
+    ta+=Number(b.amount||0);
 
     bookingsBody.innerHTML+=`
-      <tr>
-        <td><input type="checkbox" class="rowCheck"
-          data-id="${b.id}"
-          data-name="${b.name}"
-          data-phone="${b.whatsapp}"
-          data-seats="${b.seats}">
-        </td>
-        <td>${b.name}</td>
-        <td>
-          <input value="${b.referenceName||""}"
-            style="width:120px"
-            onblur="updateReference('${b.id}',this.value)">
-        </td>
-        <td>${b.whatsapp}</td>
-        <td><span class="seat-badge">${groupSeatsByRow(seats)}</span></td>
-        <td>${seats.length}</td>
-        <td>₹${b.amount||0}</td>
-        <td>${b.payment_id||""}</td>
-        <td>${b.timestamp?new Date(b.timestamp).toLocaleString():""}</td>
-        <td><button class="wa-btn" onclick="previewSingle('${b.id}')">Send</button></td>
-        <td>${b.whatsappSent?"✔ Sent":"Pending"}</td>
-      </tr>`;
+    <tr>
+      <td><input type="checkbox" class="rowCheck"
+        data-id="${b.id}"
+        data-name="${b.name}"
+        data-phone="${b.whatsapp}"
+        data-seats="${b.seats}">
+      </td>
+      <td>${b.name}</td>
+      <td><input value="${b.referenceName||""}" onblur="updateReference('${b.id}',this.value)"></td>
+      <td>${b.whatsapp}</td>
+      <td><span class="seat-badge">${groupSeatsDashboard(seats)}</span></td>
+      <td>${seats.length}</td>
+      <td>₹${b.amount||0}</td>
+      <td>${b.payment_id||""}</td>
+      <td>${b.timestamp?new Date(b.timestamp).toLocaleString():""}</td>
+      <td><button class="wa-btn" onclick="previewSingle('${b.id}')">Send</button></td>
+      <td>${b.whatsappSent?"✔ Sent":"Pending"}</td>
+    </tr>`;
   }
-  totalQty.textContent=totalT;
-  totalAmount.textContent=totalA;
+  totalQty.textContent=tq;
+  totalAmount.textContent=ta;
 }
 
-/* Reference */
-window.updateReference = async(id,v)=>{
-  await updateDoc(doc(db,"bookings",id),{referenceName:v.trim()});
+/* Reference update */
+window.updateReference=async(id,val)=>{
+  await updateDoc(doc(db,"bookings",id),{referenceName:val.trim()});
 };
 
-/* Search – SAFE (only after dashboard exists) */
-document.getElementById("searchInput").oninput = e=>{
-  const q=e.target.value.toLowerCase();
+/* Search */
+searchInput.oninput=()=>{
+  const q=searchInput.value.toLowerCase();
   document.querySelectorAll("#bookingsBody tr").forEach(tr=>{
     tr.style.display = tr.innerText.toLowerCase().includes(q) ? "" : "none";
   });
 };
 
 /* WhatsApp */
+let previewQueue=[];
 window.previewSingle=id=>{
   const cb=document.querySelector(`.rowCheck[data-id="${id}"]`);
   previewQueue=[{
     id,
     phone:cb.dataset.phone.replace(/\D/g,""),
-    message:`Hello ${cb.dataset.name}\n\nYour booking is confirmed.`
+    message:buildMessage(cb.dataset.name,cb.dataset.seats)
   }];
   previewText.textContent=previewQueue[0].message;
   previewModal.style.display="flex";
@@ -265,23 +265,8 @@ window.confirmSend=async()=>{
   });
   loadBookings();
 };
-
-/* CSV */
-exportBtn.onclick = async()=>{
-  const snap=await getDocs(collection(db,"bookings"));
-  const rows=snap.docs.map(d=>d.data());
-  if(!rows.length) return;
-  const csv=["Name,Reference,WhatsApp,Seats,Qty,Amount,Payment ID"];
-  rows.forEach(r=>{
-    csv.push(`"${r.name||""}","${r.referenceName||""}","${r.whatsapp||""}","${r.seats||""}",${r.seats?.split(",").length||0},${r.amount||0},"${r.payment_id||""}"`);
-  });
-  const b=new Blob([csv.join("\n")],{type:"text/csv"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download="aarambh_bookings.csv";
-  a.click();
-};
 </script>
 
 </body>
 </html>
+
