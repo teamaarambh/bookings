@@ -26,12 +26,33 @@ button.wa{background:#25D366}
 .stat{background:white;padding:16px 22px;border-radius:12px}
 .stat .label{font-size:12px;opacity:.7}
 .stat .value{font-size:26px;font-weight:800}
+
 table{width:100%;border-collapse:collapse;margin-top:20px;background:white}
-th,td{padding:10px;border-bottom:1px solid #ddd;font-size:14px}
+th,td{padding:10px;border-bottom:1px solid #ddd;font-size:14px;vertical-align:top}
 th{background:var(--accent);color:white;text-align:left}
 tr:nth-child(even){background:#f6f2eb}
-.seat-badge{background:var(--accent);color:white;padding:4px 8px;border-radius:6px;font-size:12px}
-.wa-btn{background:#25D366;color:white;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700}
+
+.seat-badge{
+  background:var(--accent);
+  color:white;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:12px;
+  display:inline-block;
+  max-width:240px;
+  white-space:normal;
+  line-height:1.4;
+}
+
+.wa-btn{
+  background:#25D366;
+  color:white;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+}
+
 .center{display:flex;justify-content:center;align-items:center;min-height:100vh}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999}
 .modal-card{background:white;padding:22px;border-radius:14px;max-width:520px;width:90%}
@@ -66,7 +87,6 @@ tr:nth-child(even){background:#f6f2eb}
         </div>
       </div>
 
-      <!-- SEARCH BAR -->
       <input id="searchInput" placeholder="Search bookings..." style="max-width:260px;margin-top:14px">
 
       <div class="stat-grid">
@@ -169,27 +189,6 @@ function groupSeatsByRow(seats){
   }).join(" | ");
 }
 
-/* WhatsApp message */
-function buildMessage(name,seatsRaw){
-  const seats=normalizeSeats(seatsRaw);
-  const label=seats.length===1?"Seat":"Seats";
-  return `Hello ${name}
-
-Warm greetings from Team Aarambh!
-
-We’re delighted to welcome you to *Drama Night 2.0*
-Your place is reserved, and we can’t wait to have you with us.
-
-${label}: ${seats.join(", ")}
-Date: 16 Jan 2026
-Time: 6:30 – 8:30 PM
-Venue: Symbiosis College Auditorium
-https://maps.app.goo.gl/27cv4kFw84Zgnjc67
-
-Looking forward to hosting you.
-— Team Aarambh`;
-}
-
 /* Load bookings */
 async function loadBookings(){
   bookingsBody.innerHTML="";
@@ -214,11 +213,9 @@ async function loadBookings(){
         </td>
         <td>${b.name}</td>
         <td>
-          <input
-            value="${b.referenceName || ""}"
-            placeholder="—"
+          <input value="${b.referenceName||""}"
             style="width:120px"
-            onblur="updateReference('${b.id}', this.value)">
+            onblur="updateReference('${b.id}',this.value)">
         </td>
         <td>${b.whatsapp}</td>
         <td><span class="seat-badge">${groupSeatsByRow(seats)}</span></td>
@@ -234,28 +231,26 @@ async function loadBookings(){
   totalAmount.textContent=totalA;
 }
 
-/* Reference update */
-window.updateReference = async (id, value) => {
-  await updateDoc(doc(db,"bookings",id),{
-    referenceName:value.trim()
-  });
+/* Reference */
+window.updateReference = async(id,v)=>{
+  await updateDoc(doc(db,"bookings",id),{referenceName:v.trim()});
 };
 
-/* Search */
-searchInput.oninput = () => {
-  const q = searchInput.value.toLowerCase();
+/* Search – SAFE (only after dashboard exists) */
+document.getElementById("searchInput").oninput = e=>{
+  const q=e.target.value.toLowerCase();
   document.querySelectorAll("#bookingsBody tr").forEach(tr=>{
     tr.style.display = tr.innerText.toLowerCase().includes(q) ? "" : "none";
   });
 };
 
-/* WhatsApp send */
+/* WhatsApp */
 window.previewSingle=id=>{
-  const cb=document.querySelector(\`.rowCheck[data-id="\${id}"]\`);
+  const cb=document.querySelector(`.rowCheck[data-id="${id}"]`);
   previewQueue=[{
     id,
     phone:cb.dataset.phone.replace(/\D/g,""),
-    message:buildMessage(cb.dataset.name,cb.dataset.seats)
+    message:`Hello ${cb.dataset.name}\n\nYour booking is confirmed.`
   }];
   previewText.textContent=previewQueue[0].message;
   previewModal.style.display="flex";
@@ -263,7 +258,7 @@ window.previewSingle=id=>{
 window.confirmSend=async()=>{
   previewModal.style.display="none";
   const p=previewQueue[0];
-  window.open(\`https://wa.me/91\${p.phone}?text=\${encodeURIComponent(p.message)}\`,"_blank");
+  window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(p.message)}`,"_blank");
   await updateDoc(doc(db,"bookings",p.id),{
     whatsappSent:true,
     whatsappSentAt:serverTimestamp()
@@ -271,37 +266,20 @@ window.confirmSend=async()=>{
   loadBookings();
 };
 
-/* CSV Export */
-exportBtn.onclick = async () => {
-  const snap = await getDocs(collection(db,"bookings"));
-  const rows = snap.docs.map(d=>d.data());
-
-  if(!rows.length) return alert("No data to export");
-
-  const headers = ["Name","Reference","WhatsApp","Seats","Qty","Amount","Payment ID","WhatsApp Sent","Date"];
-
-  const csv = [
-    headers.join(","),
-    ...rows.map(r=>[
-      `"${r.name||""}"`,
-      `"${r.referenceName||""}"`,
-      `"${r.whatsapp||""}"`,
-      `"${r.seats||""}"`,
-      r.seats ? r.seats.split(",").filter(Boolean).length : 0,
-      r.amount||0,
-      `"${r.payment_id||""}"`,
-      r.whatsappSent?"Yes":"No",
-      r.timestamp?new Date(r.timestamp).toLocaleString():""
-    ].join(","))
-  ].join("\n");
-
-  const blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `aarambh_bookings_${Date.now()}.csv`;
+/* CSV */
+exportBtn.onclick = async()=>{
+  const snap=await getDocs(collection(db,"bookings"));
+  const rows=snap.docs.map(d=>d.data());
+  if(!rows.length) return;
+  const csv=["Name,Reference,WhatsApp,Seats,Qty,Amount,Payment ID"];
+  rows.forEach(r=>{
+    csv.push(`"${r.name||""}","${r.referenceName||""}","${r.whatsapp||""}","${r.seats||""}",${r.seats?.split(",").length||0},${r.amount||0},"${r.payment_id||""}"`);
+  });
+  const b=new Blob([csv.join("\n")],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download="aarambh_bookings.csv";
   a.click();
-  URL.revokeObjectURL(url);
 };
 </script>
 
