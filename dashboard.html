@@ -57,6 +57,7 @@ tr:nth-child(even){background:#f6f2eb}
 <div id="dashboardView" style="display:none">
   <div class="wrap">
     <div class="card">
+
       <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px">
         <h2>🎟 Aarambh Bookings</h2>
         <div>
@@ -64,6 +65,9 @@ tr:nth-child(even){background:#f6f2eb}
           <button id="logoutBtn">Logout</button>
         </div>
       </div>
+
+      <!-- SEARCH BAR -->
+      <input id="searchInput" placeholder="Search bookings..." style="max-width:260px;margin-top:14px">
 
       <div class="stat-grid">
         <div class="stat">
@@ -81,6 +85,7 @@ tr:nth-child(even){background:#f6f2eb}
           <tr>
             <th></th>
             <th>Name</th>
+            <th>Reference</th>
             <th>WhatsApp</th>
             <th>Seats</th>
             <th>Qty</th>
@@ -93,6 +98,7 @@ tr:nth-child(even){background:#f6f2eb}
         </thead>
         <tbody id="bookingsBody"></tbody>
       </table>
+
     </div>
   </div>
 </div>
@@ -207,6 +213,13 @@ async function loadBookings(){
           data-seats="${b.seats}">
         </td>
         <td>${b.name}</td>
+        <td>
+          <input
+            value="${b.referenceName || ""}"
+            placeholder="—"
+            style="width:120px"
+            onblur="updateReference('${b.id}', this.value)">
+        </td>
         <td>${b.whatsapp}</td>
         <td><span class="seat-badge">${groupSeatsByRow(seats)}</span></td>
         <td>${seats.length}</td>
@@ -221,9 +234,24 @@ async function loadBookings(){
   totalAmount.textContent=totalA;
 }
 
+/* Reference update */
+window.updateReference = async (id, value) => {
+  await updateDoc(doc(db,"bookings",id),{
+    referenceName:value.trim()
+  });
+};
+
+/* Search */
+searchInput.oninput = () => {
+  const q = searchInput.value.toLowerCase();
+  document.querySelectorAll("#bookingsBody tr").forEach(tr=>{
+    tr.style.display = tr.innerText.toLowerCase().includes(q) ? "" : "none";
+  });
+};
+
 /* WhatsApp send */
 window.previewSingle=id=>{
-  const cb=document.querySelector(`.rowCheck[data-id="${id}"]`);
+  const cb=document.querySelector(\`.rowCheck[data-id="\${id}"]\`);
   previewQueue=[{
     id,
     phone:cb.dataset.phone.replace(/\D/g,""),
@@ -235,59 +263,46 @@ window.previewSingle=id=>{
 window.confirmSend=async()=>{
   previewModal.style.display="none";
   const p=previewQueue[0];
-  window.open(`https://wa.me/91${p.phone}?text=${encodeURIComponent(p.message)}`,"_blank");
+  window.open(\`https://wa.me/91\${p.phone}?text=\${encodeURIComponent(p.message)}\`,"_blank");
   await updateDoc(doc(db,"bookings",p.id),{
     whatsappSent:true,
     whatsappSentAt:serverTimestamp()
   });
   loadBookings();
 };
-  /* CSV EXPORT — FIX ONLY */
+
+/* CSV Export */
 exportBtn.onclick = async () => {
-  const snap = await getDocs(collection(db, "bookings"));
-  const rows = snap.docs.map(d => d.data());
+  const snap = await getDocs(collection(db,"bookings"));
+  const rows = snap.docs.map(d=>d.data());
 
-  if (!rows.length) {
-    alert("No data to export");
-    return;
-  }
+  if(!rows.length) return alert("No data to export");
 
-  const headers = [
-    "Name",
-    "WhatsApp",
-    "Seats",
-    "Quantity",
-    "Amount",
-    "Payment ID",
-    "WhatsApp Sent",
-    "Booking Date"
-  ];
+  const headers = ["Name","Reference","WhatsApp","Seats","Qty","Amount","Payment ID","WhatsApp Sent","Date"];
 
   const csv = [
     headers.join(","),
-    ...rows.map(r => [
-      `"${r.name || ""}"`,
-      `"${r.whatsapp || ""}"`,
-      `"${r.seats || ""}"`,
-      (r.seats ? r.seats.split(",").filter(Boolean).length : 0),
-      r.amount || 0,
-      `"${r.payment_id || ""}"`,
-      r.whatsappSent ? "Yes" : "No",
-      r.timestamp ? new Date(r.timestamp).toLocaleString() : ""
+    ...rows.map(r=>[
+      `"${r.name||""}"`,
+      `"${r.referenceName||""}"`,
+      `"${r.whatsapp||""}"`,
+      `"${r.seats||""}"`,
+      r.seats ? r.seats.split(",").filter(Boolean).length : 0,
+      r.amount||0,
+      `"${r.payment_id||""}"`,
+      r.whatsappSent?"Yes":"No",
+      r.timestamp?new Date(r.timestamp).toLocaleString():""
     ].join(","))
   ].join("\n");
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
   const url = URL.createObjectURL(blob);
-
   const a = document.createElement("a");
   a.href = url;
   a.download = `aarambh_bookings_${Date.now()}.csv`;
   a.click();
-
   URL.revokeObjectURL(url);
 };
-
 </script>
 
 </body>
