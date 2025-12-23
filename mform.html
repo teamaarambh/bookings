@@ -132,9 +132,11 @@ saveBtn.onclick = async () => {
     referenceName.value="";
     timestamp.value=new Date().toISOString();
   }catch(e){
-    msg.textContent = "Failed to save entry";
-    msg.className = "error";
-  }
+  console.error("Firestore write failed:", e);
+  msg.textContent = "❌ " + e.message;
+  msg.className = "error";
+}
+
 };
 </script>
 </body>
