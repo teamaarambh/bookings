@@ -292,6 +292,61 @@ window.confirmSend=async()=>{
   });
   loadBookings();
 };
+  /* =======================
+   EXPORT CSV — FIXED
+   ======================= */
+
+exportBtn.onclick = async () => {
+  const snap = await getDocs(collection(db, "bookings"));
+
+  const rows = [];
+  rows.push([
+    "Name",
+    "Reference",
+    "WhatsApp",
+    "Seats (Grouped)",
+    "Qty",
+    "Amount",
+    "Payment ID",
+    "Date",
+    "WhatsApp Status"
+  ]);
+
+  snap.docs
+    .map(d => d.data())
+    .sort((a,b)=>new Date(a.timestamp||0)-new Date(b.timestamp||0))
+    .forEach(b => {
+      const seatsArr = normalizeSeats(b.seats || "");
+      const groupedSeats = groupSeatsByRow(seatsArr);
+
+      rows.push([
+        b.name || "",
+        b.referenceName || "",
+        b.whatsapp || "",
+        groupedSeats,
+        seatsArr.length,
+        b.amount || 0,
+        b.payment_id || "",
+        b.timestamp ? new Date(b.timestamp).toLocaleString() : "",
+        b.whatsappSent ? "Sent" : "Pending"
+      ]);
+    });
+
+  const csv = rows
+    .map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(","))
+    .join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "aarambh_bookings.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
 </script>
 
 </body>
