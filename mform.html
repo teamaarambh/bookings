@@ -24,7 +24,7 @@ body{
   padding:24px;
   border-radius:14px;
 }
-h2{margin-top:0;text-align:center}
+h2{text-align:center;margin-top:0}
 label{
   display:block;
   margin-top:14px;
@@ -37,7 +37,6 @@ input{
   margin-top:6px;
   border-radius:8px;
   border:1px solid #ccc;
-  font-size:14px;
 }
 button{
   margin-top:22px;
@@ -61,30 +60,35 @@ button{
   <div class="card">
     <h2>Manual Booking Entry</h2>
 
-    <label>Name</label>
-    <input id="name">
+    <!-- FORM IS REQUIRED -->
+    <form id="entryForm">
 
-    <label>WhatsApp</label>
-    <input id="whatsapp" placeholder="10-digit number">
+      <label>Name</label>
+      <input id="name" required>
 
-    <label>Seats</label>
-    <input id="seats" placeholder="A1, A2, A3">
+      <label>WhatsApp</label>
+      <input id="whatsapp" required>
 
-    <label>Amount</label>
-    <input id="amount" type="number">
+      <label>Seats</label>
+      <input id="seats" placeholder="A1, A2, A3">
 
-    <label>Payment ID</label>
-    <input id="payment_id">
+      <label>Amount</label>
+      <input id="amount" type="number" required>
 
-    <label>Reference Name</label>
-    <input id="referenceName">
+      <label>Payment ID</label>
+      <input id="payment_id">
 
-    <label>Timestamp</label>
-    <input id="timestamp">
+      <label>Reference Name</label>
+      <input id="referenceName">
 
-    <button id="saveBtn">Save Entry</button>
+      <label>Timestamp</label>
+      <input id="timestamp">
 
-    <div id="msg"></div>
+      <button type="submit">Save Entry</button>
+
+      <div id="msg"></div>
+    </form>
+
   </div>
 </div>
 
@@ -101,7 +105,10 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-/* DOM bindings (CRITICAL) */
+/* DOM */
+const form = document.getElementById("entryForm");
+const msg = document.getElementById("msg");
+
 const nameInput = document.getElementById("name");
 const whatsappInput = document.getElementById("whatsapp");
 const seatsInput = document.getElementById("seats");
@@ -109,48 +116,38 @@ const amountInput = document.getElementById("amount");
 const paymentIdInput = document.getElementById("payment_id");
 const referenceInput = document.getElementById("referenceName");
 const timestampInput = document.getElementById("timestamp");
-const saveBtn = document.getElementById("saveBtn");
-const msg = document.getElementById("msg");
 
 /* Default timestamp */
 timestampInput.value = new Date().toISOString();
 
-saveBtn.addEventListener("click", async () => {
+/* SUBMIT HANDLER — THIS IS THE FIX */
+form.addEventListener("submit", async (e) => {
+  e.preventDefault(); // 🔥 CRITICAL
+
   msg.textContent = "";
   msg.className = "";
 
   const data = {
     name: nameInput.value.trim(),
     whatsapp: whatsappInput.value.trim(),
-    seats: seatsInput.value.trim(),           // NEW FIELD
-    amount: Number(amountInput.value || 0),
+    seats: seatsInput.value.trim(),
+    amount: Number(amountInput.value),
     payment_id: paymentIdInput.value.trim(),
     referenceName: referenceInput.value.trim(),
-    timestamp: timestampInput.value.trim()     // STRING
+    timestamp: timestampInput.value.trim()
   };
-
-  if (!data.name || !data.whatsapp) {
-    msg.textContent = "Name and WhatsApp are required";
-    msg.className = "error";
-    return;
-  }
 
   try {
     await addDoc(collection(db, "bookings"), data);
     msg.textContent = "✅ Entry saved successfully";
     msg.className = "success";
 
-    nameInput.value = "";
-    whatsappInput.value = "";
-    seatsInput.value = "";
-    amountInput.value = "";
-    paymentIdInput.value = "";
-    referenceInput.value = "";
+    form.reset();
     timestampInput.value = new Date().toISOString();
 
-  } catch (e) {
-    console.error("Firestore error:", e);
-    msg.textContent = "❌ " + e.message;
+  } catch (err) {
+    console.error(err);
+    msg.textContent = "❌ " + err.message;
     msg.className = "error";
   }
 });
