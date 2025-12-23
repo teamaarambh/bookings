@@ -62,6 +62,7 @@ button[type="submit"]{
     <h2>Manual Booking Entry</h2>
 
     <form id="entryForm">
+
       <label>Name</label>
       <input id="name" required>
 
@@ -101,7 +102,6 @@ import {
   addDoc,
   query,
   where,
-  orderBy,
   limit,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -149,37 +149,35 @@ function normalizeAndSortSeats(raw){
     }).join(", ");
 }
 
-/* PREFILL BY WHATSAPP */
-prefillBtn.addEventListener("click", async () => {
-  msg.textContent = "";
-  msg.className = "";
+/* PREFILL BY WHATSAPP (SAFE FOR MIXED DATA) */
+prefillBtn.addEventListener("click", async ()=>{
+  msg.textContent=""; msg.className="";
 
   const cleanWhatsapp = normalizeWhatsapp(whatsappInput.value);
-  if (!cleanWhatsapp) {
-    msg.textContent = "❌ Enter valid WhatsApp number to prefill";
-    msg.className = "error";
+  if(!cleanWhatsapp){
+    msg.textContent="❌ Enter valid WhatsApp number";
+    msg.className="error";
     return;
   }
 
-  try {
+  try{
     const q = query(
-      collection(db, "bookings"),
-      where("whatsapp", "==", cleanWhatsapp),
+      collection(db,"bookings"),
+      where("whatsapp","==",cleanWhatsapp),
       limit(10)
     );
 
     const snap = await getDocs(q);
 
-    if (snap.empty) {
-      msg.textContent = "No previous record found for this number";
-      msg.className = "error";
+    if(snap.empty){
+      msg.textContent="No previous record found";
+      msg.className="error";
       return;
     }
 
     const records = snap.docs.map(d => d.data());
 
-    // Sort safely even if timestamp types differ
-    records.sort((a, b) => {
+    records.sort((a,b)=>{
       const ta = typeof a.timestamp === "string"
         ? a.timestamp
         : a.timestamp?.toDate?.().toISOString() || "";
@@ -193,19 +191,18 @@ prefillBtn.addEventListener("click", async () => {
 
     nameInput.value = d.name || "";
     seatsInput.value = d.seats || "";
-    amountInput.value = d.amount || "";
+    amountInput.value = d.amount ?? "";
     referenceInput.value = d.referenceName || "";
 
-    msg.textContent = "✅ Prefilled from previous record";
-    msg.className = "success";
+    msg.textContent="✅ Prefilled from previous record";
+    msg.className="success";
 
-  } catch (e) {
-    console.error("Prefill error:", e);
-    msg.textContent = "❌ " + (e.message || "Prefill failed");
-    msg.className = "error";
+  }catch(e){
+    console.error(e);
+    msg.textContent="❌ "+(e.message||"Prefill failed");
+    msg.className="error";
   }
 });
-
 
 /* SAVE */
 form.addEventListener("submit", async e=>{
