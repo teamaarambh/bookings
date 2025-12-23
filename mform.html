@@ -24,7 +24,7 @@ body{
   padding:24px;
   border-radius:14px;
 }
-h2{margin-top:0}
+h2{margin-top:0;text-align:center}
 label{
   display:block;
   margin-top:14px;
@@ -50,12 +50,13 @@ button{
   font-weight:700;
   cursor:pointer;
 }
-.success{color:#27ae60;margin-top:14px}
-.error{color:#c0392b;margin-top:14px}
+.success{color:#27ae60;margin-top:14px;text-align:center}
+.error{color:#c0392b;margin-top:14px;text-align:center}
 </style>
 </head>
 
 <body>
+
 <div class="wrap">
   <div class="card">
     <h2>Manual Booking Entry</h2>
@@ -63,8 +64,11 @@ button{
     <label>Name</label>
     <input id="name">
 
-    <label>WhatsApp Number</label>
+    <label>WhatsApp</label>
     <input id="whatsapp" placeholder="10-digit number">
+
+    <label>Seats</label>
+    <input id="seats" placeholder="A1, A2, A3">
 
     <label>Amount</label>
     <input id="amount" type="number">
@@ -88,30 +92,41 @@ button{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* Firebase — SAME PROJECT */
+/* Firebase */
 const app = initializeApp({
   apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
   authDomain: "aarambh-ticket-bookings.firebaseapp.com",
   projectId: "aarambh-ticket-bookings",
   appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
 });
-
 const db = getFirestore(app);
 
-/* Default timestamp = NOW (STRING) */
-timestamp.value = new Date().toISOString();
+/* DOM bindings (CRITICAL) */
+const nameInput = document.getElementById("name");
+const whatsappInput = document.getElementById("whatsapp");
+const seatsInput = document.getElementById("seats");
+const amountInput = document.getElementById("amount");
+const paymentIdInput = document.getElementById("payment_id");
+const referenceInput = document.getElementById("referenceName");
+const timestampInput = document.getElementById("timestamp");
+const saveBtn = document.getElementById("saveBtn");
+const msg = document.getElementById("msg");
 
-saveBtn.onclick = async () => {
+/* Default timestamp */
+timestampInput.value = new Date().toISOString();
+
+saveBtn.addEventListener("click", async () => {
   msg.textContent = "";
   msg.className = "";
 
   const data = {
-    name: name.value.trim(),
-    whatsapp: whatsapp.value.trim(),
-    amount: Number(amount.value || 0),
-    payment_id: payment_id.value.trim(),
-    referenceName: referenceName.value.trim(),
-    timestamp: timestamp.value.trim()   // STRING, NOT serverTimestamp
+    name: nameInput.value.trim(),
+    whatsapp: whatsappInput.value.trim(),
+    seats: seatsInput.value.trim(),           // NEW FIELD
+    amount: Number(amountInput.value || 0),
+    payment_id: paymentIdInput.value.trim(),
+    referenceName: referenceInput.value.trim(),
+    timestamp: timestampInput.value.trim()     // STRING
   };
 
   if (!data.name || !data.whatsapp) {
@@ -120,24 +135,26 @@ saveBtn.onclick = async () => {
     return;
   }
 
-  try{
-    await addDoc(collection(db,"bookings"), data);
-    msg.textContent = "Booking saved successfully";
+  try {
+    await addDoc(collection(db, "bookings"), data);
+    msg.textContent = "✅ Entry saved successfully";
     msg.className = "success";
 
-    name.value="";
-    whatsapp.value="";
-    amount.value="";
-    payment_id.value="";
-    referenceName.value="";
-    timestamp.value=new Date().toISOString();
-  }catch(e){
-  console.error("Firestore write failed:", e);
-  msg.textContent = "❌ " + e.message;
-  msg.className = "error";
-}
+    nameInput.value = "";
+    whatsappInput.value = "";
+    seatsInput.value = "";
+    amountInput.value = "";
+    paymentIdInput.value = "";
+    referenceInput.value = "";
+    timestampInput.value = new Date().toISOString();
 
-};
+  } catch (e) {
+    console.error("Firestore error:", e);
+    msg.textContent = "❌ " + e.message;
+    msg.className = "error";
+  }
+});
 </script>
+
 </body>
 </html>
