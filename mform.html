@@ -60,17 +60,16 @@ button{
   <div class="card">
     <h2>Manual Booking Entry</h2>
 
-    <!-- FORM IS REQUIRED -->
     <form id="entryForm">
 
       <label>Name</label>
       <input id="name" required>
 
       <label>WhatsApp</label>
-      <input id="whatsapp" required>
+      <input id="whatsapp" required placeholder="+91 9876543210">
 
       <label>Seats</label>
-      <input id="seats" placeholder="A1, A2, A3">
+      <input id="seats" placeholder="A1, A2, B10">
 
       <label>Amount</label>
       <input id="amount" type="number" required>
@@ -88,7 +87,6 @@ button{
 
       <div id="msg"></div>
     </form>
-
   </div>
 </div>
 
@@ -120,35 +118,61 @@ const timestampInput = document.getElementById("timestamp");
 /* Default timestamp */
 timestampInput.value = new Date().toISOString();
 
-/* SUBMIT HANDLER — THIS IS THE FIX */
-form.addEventListener("submit", async (e) => {
-  e.preventDefault(); // 🔥 CRITICAL
+/* Helpers */
+function normalizeWhatsapp(raw){
+  const d = raw.replace(/\D/g,"");
+  if (d.length === 10) return d;
+  if (d.length === 12 && d.startsWith("91")) return d.slice(2);
+  return null;
+}
 
-  msg.textContent = "";
-  msg.className = "";
+function normalizeAndSortSeats(raw){
+  return raw.split(",")
+    .map(s => s.trim().toUpperCase())
+    .filter(Boolean)
+    .sort((a,b)=>{
+      const [,r1,n1] = a.match(/^([A-Z]+)(\d+)$/) || [];
+      const [,r2,n2] = b.match(/^([A-Z]+)(\d+)$/) || [];
+      if(!r1 || !r2) return a.localeCompare(b);
+      return r1===r2 ? n1-n2 : r1.localeCompare(r2);
+    })
+    .join(", ");
+}
+
+/* Submit */
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  msg.textContent="";
+  msg.className="";
+
+  const cleanWhatsapp = normalizeWhatsapp(whatsappInput.value);
+  if(!cleanWhatsapp){
+    msg.textContent="❌ Invalid WhatsApp number";
+    msg.className="error";
+    return;
+  }
 
   const data = {
     name: nameInput.value.trim(),
-    whatsapp: whatsappInput.value.trim(),
-    seats: seatsInput.value.trim(),
+    whatsapp: cleanWhatsapp,
+    seats: normalizeAndSortSeats(seatsInput.value),
     amount: Number(amountInput.value),
     payment_id: paymentIdInput.value.trim(),
     referenceName: referenceInput.value.trim(),
     timestamp: timestampInput.value.trim()
   };
 
-  try {
-    await addDoc(collection(db, "bookings"), data);
-    msg.textContent = "✅ Entry saved successfully";
-    msg.className = "success";
-
+  try{
+    await addDoc(collection(db,"bookings"), data);
+    msg.textContent="✅ Entry saved successfully";
+    msg.className="success";
     form.reset();
-    timestampInput.value = new Date().toISOString();
-
-  } catch (err) {
+    timestampInput.value=new Date().toISOString();
+  }catch(err){
     console.error(err);
-    msg.textContent = "❌ " + err.message;
-    msg.className = "error";
+    msg.textContent="❌ "+err.message;
+    msg.className="error";
   }
 });
 </script>
