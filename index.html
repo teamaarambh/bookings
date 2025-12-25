@@ -227,7 +227,7 @@
         </div>
 
         <!-- VENUE + MAP -->
-       <div style="position:relative;width:100%;max-width:260px;border-radius:8px;overflow:hidden;">
+       <div style="position:relative;width:100%;max-width:260px;border-radius:8px;overflow:hidden;margin:0 auto;">
   <button
     onclick="openDirections()"
     aria-label="Get directions to venue"
@@ -385,12 +385,10 @@
   </script>
   <script>
 function openDirections() {
-  function openDirections() {
   const venueLat = 18.565917;
-  const venueLng = 73.907444;   // Symbiosis College (approx)
+  const venueLng = 73.907444; // Symbiosis College Auditorium
 
   if (!navigator.geolocation) {
-    // Geolocation not supported
     window.open(
       `https://www.google.com/maps/dir/?api=1&destination=${venueLat},${venueLng}`,
       "_blank"
@@ -411,8 +409,7 @@ function openDirections() {
 
       window.open(directionsUrl, "_blank");
     },
-    error => {
-      // Permission denied / timeout / error
+    () => {
       window.open(
         `https://www.google.com/maps/dir/?api=1&destination=${venueLat},${venueLng}`,
         "_blank"
@@ -426,5 +423,5 @@ function openDirections() {
   );
 }
 </script>
-</body>
+  </body>
 </html>
