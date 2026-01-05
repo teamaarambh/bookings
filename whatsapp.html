@@ -109,7 +109,7 @@ button{
   </div>
 </div>
 
-<!-- CHAT PREVIEW MODAL -->
+<!-- CHAT PREVIEW -->
 <div id="previewModal">
   <div id="previewCard">
     <h3 style="margin-top:0">WhatsApp Preview</h3>
@@ -138,12 +138,12 @@ let queuedNumbers = [];
 /* Normalize Indian numbers */
 function normalize(num){
   const d = num.replace(/\D/g,"");
-  if(d.length === 10) return "91"+d;
+  if(d.length === 10) return "91" + d;
   if(d.length === 12 && d.startsWith("91")) return d;
   return null;
 }
 
-/* Preview step */
+/* PREVIEW STEP (SYNC SAFE) */
 startBtn.onclick = async () => {
   if(!fileInput.files[0] || !messageInput.value){
     alert("Upload numbers and enter message");
@@ -151,13 +151,19 @@ startBtn.onclick = async () => {
   }
 
   const text = await fileInput.files[0].text();
-  const numbers = text
-    .split(/\r?\n/)
-    .map(l => normalize(l))
+
+  const rawValues = text
+    .replace(/\uFEFF/g,"")
+    .split(/[\n,]/)
+    .map(v => v.trim())
+    .filter(Boolean);
+
+  const numbers = rawValues
+    .map(v => normalize(v))
     .filter(Boolean);
 
   if(numbers.length === 0){
-    alert("No valid numbers found");
+    alert("No valid mobile numbers found");
     return;
   }
 
@@ -171,25 +177,26 @@ function closePreview(){
   document.getElementById("previewModal").style.display = "none";
 }
 
-/* Confirm & send */
-async function confirmSend(){
+/* CONFIRM & SEND — BROWSER SAFE */
+function confirmSend(){
   closePreview();
 
-  // Open PDF once (user attaches manually)
+  // Emoji-safe encoding (SYNC)
+  const safeMsg = encodeURIComponent(messageInput.value);
+
+  // Open PDF once (manual attach)
   if(pdfInput.files[0]){
     const pdfURL = URL.createObjectURL(pdfInput.files[0]);
     window.open(pdfURL, "_blank");
   }
 
-  for(let i=0;i<queuedNumbers.length;i++){
-    progress.textContent = `Sending ${i+1} / ${queuedNumbers.length}`;
-      const safeMsg = await getUnicodeSafeText(messageInput.value);
-const url = `https://wa.me/${queuedNumbers[i]}?text=${encodeURIComponent(safeMsg)}`;
+  // Open all WhatsApp tabs synchronously
+  queuedNumbers.forEach(num => {
+    const url = `https://wa.me/${num}?text=${safeMsg}`;
     window.open(url, "_blank");
-    await new Promise(r => setTimeout(r, 1200));
-  }
+  });
 
-  progress.textContent = "Done ✅";
+  progress.textContent = `Opened ${queuedNumbers.length} WhatsApp chats`;
 }
 </script>
 </body>
