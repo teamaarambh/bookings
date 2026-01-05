@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Aarambh • Bulk WhatsApp Sender</title>
+<title>Aarambh • WhatsApp Sender</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;600;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@ body{
   background:#f6f2eb;
   color:#533A5A;
 }
-.wrap{max-width:720px;margin:40px auto;padding:20px}
+.wrap{max-width:760px;margin:40px auto;padding:20px}
 .card{background:#fff;padding:24px;border-radius:16px}
 h2{text-align:center;margin-top:0}
 
@@ -27,46 +27,42 @@ textarea,input{
   border:1px solid #ccc;
 }
 
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  font-size:14px;
+}
+th{background:#533A5A;color:white}
+tr:nth-child(even){background:#f6f2eb}
+
 button{
-  padding:8px 12px;
+  padding:6px 12px;
   border:none;
   border-radius:8px;
   background:#25D366;
   color:white;
   font-weight:700;
   cursor:pointer;
+  font-size:12px;
 }
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:20px;
-  background:white;
-}
-th,td{
-  padding:10px;
-  border-bottom:1px solid #ddd;
-  font-size:14px;
-  text-align:left;
-}
-th{background:#533A5A;color:white}
-tr:nth-child(even){background:#f6f2eb}
-
-.send-btn{font-size:12px;padding:6px 10px}
 </style>
 </head>
 
 <body>
 <div class="wrap">
   <div class="card">
-    <h2>Bulk WhatsApp Sender</h2>
+    <h2>WhatsApp Message Sender</h2>
 
     <label>Upload CSV / TXT (Name, Mobile optional)</label>
     <input type="file" id="fileInput" accept=".csv,.txt">
 
     <label>Message (use system emoji picker)</label>
-    <textarea id="messageInput" rows="5"
-      placeholder="🎭 Drama Night 2.0 🎟️&#10;See you soon 🔥"></textarea>
+    <textarea id="messageInput" rows="10" placeholder="🎭 Drama Night 2.0 🎟️&#10;&#10;We’re back with an all-new edition!"></textarea>
 
     <label>PDF Attachment</label>
     <input type="file" id="pdfInput" accept="application/pdf">
@@ -92,7 +88,7 @@ const pdfInput = document.getElementById("pdfInput");
 const listBody = document.getElementById("listBody");
 const listTable = document.getElementById("listTable");
 
-/* Normalize Indian numbers */
+/* Normalize Indian mobile numbers */
 function normalize(num){
   const d = num.replace(/\D/g,"");
   if(d.length === 10) return "91" + d;
@@ -117,7 +113,7 @@ fileInput.onchange = async () => {
 
   let count = 0;
 
-  rows.forEach((row, i) => {
+  rows.forEach(row => {
     const parts = row.split(",");
     const name = parts.length > 1 ? parts[0].trim() : "";
     const mobileRaw = parts.length > 1 ? parts[1] : parts[0];
@@ -133,10 +129,7 @@ fileInput.onchange = async () => {
       <td>${name || "-"}</td>
       <td>${mobile}</td>
       <td>
-        <button class="send-btn"
-          onclick="sendSingle('${mobile}')">
-          Send
-        </button>
+        <button onclick="sendSingle('${mobile}')">Send</button>
       </td>
     `;
     listBody.appendChild(tr);
@@ -157,15 +150,17 @@ function sendSingle(mobile){
     return;
   }
 
-  // Open PDF once (manual attach – WhatsApp limitation)
+  /* Open PDF once (manual attach – WhatsApp limitation) */
   if(pdfInput.files[0]){
     const pdfURL = URL.createObjectURL(pdfInput.files[0]);
     window.open(pdfURL, "_blank");
   }
 
-  // DO NOT encode text – emojis depend on this
+  /* ✅ PRESERVE EMOJIS + LINE BREAKS */
+  const msg = messageInput.value.replace(/\n/g, "%0A");
+
   window.open(
-    `https://wa.me/${mobile}?text=${messageInput.value}`,
+    `https://wa.me/${mobile}?text=${msg}`,
     "_blank"
   );
 }
