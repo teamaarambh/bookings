@@ -183,7 +183,8 @@ async function confirmSend(){
 
   for(let i=0;i<queuedNumbers.length;i++){
     progress.textContent = `Sending ${i+1} / ${queuedNumbers.length}`;
-    const url = `https://wa.me/${queuedNumbers[i]}?text=${encodeURIComponent(messageInput.value)}`;
+      const msg = messageInput.value.normalize("NFC");
+const url = `https://wa.me/${queuedNumbers[i]}?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
     await new Promise(r => setTimeout(r, 1200));
   }
