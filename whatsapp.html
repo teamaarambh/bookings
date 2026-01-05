@@ -14,7 +14,7 @@ body{
   background:#f6f2eb;
   color:#533A5A;
 }
-.wrap{max-width:620px;margin:40px auto;padding:20px}
+.wrap{max-width:720px;margin:40px auto;padding:20px}
 .card{background:#fff;padding:24px;border-radius:16px}
 h2{text-align:center;margin-top:0}
 
@@ -28,64 +28,31 @@ textarea,input{
 }
 
 button{
-  margin-top:22px;
-  padding:12px;
-  width:100%;
+  padding:8px 12px;
   border:none;
-  border-radius:10px;
+  border-radius:8px;
   background:#25D366;
   color:white;
-  font-weight:800;
+  font-weight:700;
   cursor:pointer;
 }
 
-.progress{
-  margin-top:16px;
-  font-size:14px;
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+  background:white;
 }
+th,td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  font-size:14px;
+  text-align:left;
+}
+th{background:#533A5A;color:white}
+tr:nth-child(even){background:#f6f2eb}
 
-/* Preview modal */
-#previewModal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
-}
-#previewCard{
-  background:#ece5dd;
-  padding:18px;
-  border-radius:14px;
-  max-width:420px;
-  width:90%;
-  font-family:Arial, sans-serif;
-}
-.chat-bubble{
-  background:#dcf8c6;
-  padding:10px 12px;
-  border-radius:8px;
-  margin-top:10px;
-  white-space:pre-wrap;
-  font-size:14px;
-  line-height:1.4;
-  box-shadow:0 1px 1px rgba(0,0,0,.1);
-}
-.preview-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  margin-top:16px;
-}
-.preview-actions button{
-  width:auto;
-  padding:8px 12px;
-  border-radius:6px;
-  font-weight:700;
-}
-.cancel{background:#999}
-.confirm{background:#25D366}
+.send-btn{font-size:12px;padding:6px 10px}
 </style>
 </head>
 
@@ -94,36 +61,27 @@ button{
   <div class="card">
     <h2>Bulk WhatsApp Sender</h2>
 
-    <label>Upload Mobile Numbers (CSV / TXT)</label>
+    <label>Upload CSV / TXT (Name, Mobile optional)</label>
     <input type="file" id="fileInput" accept=".csv,.txt">
 
     <label>Message (use system emoji picker)</label>
-    <textarea id="messageInput" rows="6"
+    <textarea id="messageInput" rows="5"
       placeholder="🎭 Drama Night 2.0 🎟️&#10;See you soon 🔥"></textarea>
 
     <label>PDF Attachment</label>
     <input type="file" id="pdfInput" accept="application/pdf">
 
-    <button id="startBtn">Preview & Send</button>
-
-    <div class="progress" id="progress"></div>
-  </div>
-</div>
-
-<!-- PREVIEW -->
-<div id="previewModal">
-  <div id="previewCard">
-    <h3 style="margin-top:0">WhatsApp Preview</h3>
-    <p style="font-size:13px;margin:0 0 8px">
-      Sending to <b><span id="previewCount"></span></b> recipients
-    </p>
-
-    <div class="chat-bubble" id="previewText"></div>
-
-    <div class="preview-actions">
-      <button class="cancel" onclick="closePreview()">Cancel</button>
-      <button class="confirm" onclick="confirmSend()">Confirm & Send</button>
-    </div>
+    <table id="listTable" style="display:none">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Mobile</th>
+          <th>Send</th>
+        </tr>
+      </thead>
+      <tbody id="listBody"></tbody>
+    </table>
   </div>
 </div>
 
@@ -131,10 +89,8 @@ button{
 const fileInput = document.getElementById("fileInput");
 const messageInput = document.getElementById("messageInput");
 const pdfInput = document.getElementById("pdfInput");
-const startBtn = document.getElementById("startBtn");
-const progress = document.getElementById("progress");
-
-let queuedNumbers = [];
+const listBody = document.getElementById("listBody");
+const listTable = document.getElementById("listTable");
 
 /* Normalize Indian numbers */
 function normalize(num){
@@ -144,56 +100,74 @@ function normalize(num){
   return null;
 }
 
-/* PREVIEW */
-startBtn.onclick = async () => {
-  if(!fileInput.files[0] || !messageInput.value){
-    alert("Upload numbers and enter message");
-    return;
-  }
+/* Handle file upload */
+fileInput.onchange = async () => {
+  listBody.innerHTML = "";
+  listTable.style.display = "none";
+
+  if(!fileInput.files[0]) return;
 
   const text = await fileInput.files[0].text();
 
-  const rawValues = text
+  const rows = text
     .replace(/\uFEFF/g,"")
-    .split(/[\n,]/)
-    .map(v => v.trim())
+    .split(/\r?\n/)
+    .map(r => r.trim())
     .filter(Boolean);
 
-  const numbers = rawValues
-    .map(v => normalize(v))
-    .filter(Boolean);
+  let count = 0;
 
-  if(numbers.length === 0){
+  rows.forEach((row, i) => {
+    const parts = row.split(",");
+    const name = parts.length > 1 ? parts[0].trim() : "";
+    const mobileRaw = parts.length > 1 ? parts[1] : parts[0];
+
+    const mobile = normalize(mobileRaw || "");
+    if(!mobile) return;
+
+    count++;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${count}</td>
+      <td>${name || "-"}</td>
+      <td>${mobile}</td>
+      <td>
+        <button class="send-btn"
+          onclick="sendSingle('${mobile}')">
+          Send
+        </button>
+      </td>
+    `;
+    listBody.appendChild(tr);
+  });
+
+  if(count === 0){
     alert("No valid mobile numbers found");
     return;
   }
 
-  queuedNumbers = numbers;
-  previewCount.textContent = numbers.length;
-  previewText.textContent = messageInput.value;
-  previewModal.style.display = "flex";
+  listTable.style.display = "table";
 };
 
-function closePreview(){
-  previewModal.style.display = "none";
-}
+/* Send single WhatsApp message */
+function sendSingle(mobile){
+  if(!messageInput.value){
+    alert("Enter message first");
+    return;
+  }
 
-/* SEND — FINAL, SAFE */
-function confirmSend(){
-  closePreview();
-
-  // Open PDF once (manual attach – WhatsApp restriction)
+  // Open PDF once (manual attach – WhatsApp limitation)
   if(pdfInput.files[0]){
     const pdfURL = URL.createObjectURL(pdfInput.files[0]);
     window.open(pdfURL, "_blank");
   }
 
-  // DO NOT encode text — emojis depend on this
-  queuedNumbers.forEach(num => {
-    window.open(`https://wa.me/${num}?text=${messageInput.value}`, "_blank");
-  });
-
-  progress.textContent = `Opened ${queuedNumbers.length} WhatsApp chats`;
+  // DO NOT encode text – emojis depend on this
+  window.open(
+    `https://wa.me/${mobile}?text=${messageInput.value}`,
+    "_blank"
+  );
 }
 </script>
 </body>
