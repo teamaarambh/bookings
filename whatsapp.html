@@ -97,8 +97,9 @@ button{
     <label>Upload Mobile Numbers (CSV / TXT)</label>
     <input type="file" id="fileInput" accept=".csv,.txt">
 
-    <label>Message</label>
-    <textarea id="messageInput" rows="6" placeholder="Type WhatsApp message here"></textarea>
+    <label>Message (use system emoji picker)</label>
+    <textarea id="messageInput" rows="6"
+      placeholder="🎭 Drama Night 2.0 🎟️&#10;See you soon 🔥"></textarea>
 
     <label>PDF Attachment</label>
     <input type="file" id="pdfInput" accept="application/pdf">
@@ -109,7 +110,7 @@ button{
   </div>
 </div>
 
-<!-- CHAT PREVIEW -->
+<!-- PREVIEW -->
 <div id="previewModal">
   <div id="previewCard">
     <h3 style="margin-top:0">WhatsApp Preview</h3>
@@ -143,7 +144,7 @@ function normalize(num){
   return null;
 }
 
-/* PREVIEW STEP (SYNC SAFE) */
+/* PREVIEW */
 startBtn.onclick = async () => {
   if(!fileInput.files[0] || !messageInput.value){
     alert("Upload numbers and enter message");
@@ -168,32 +169,28 @@ startBtn.onclick = async () => {
   }
 
   queuedNumbers = numbers;
-  document.getElementById("previewCount").textContent = numbers.length;
-  document.getElementById("previewText").textContent = messageInput.value;
-  document.getElementById("previewModal").style.display = "flex";
+  previewCount.textContent = numbers.length;
+  previewText.textContent = messageInput.value;
+  previewModal.style.display = "flex";
 };
 
 function closePreview(){
-  document.getElementById("previewModal").style.display = "none";
+  previewModal.style.display = "none";
 }
 
-/* CONFIRM & SEND — BROWSER SAFE */
+/* SEND — FINAL, SAFE */
 function confirmSend(){
   closePreview();
 
-  // Emoji-safe encoding (SYNC)
-  const safeMsg = encodeURIComponent(messageInput.value);
-
-  // Open PDF once (manual attach)
+  // Open PDF once (manual attach – WhatsApp restriction)
   if(pdfInput.files[0]){
     const pdfURL = URL.createObjectURL(pdfInput.files[0]);
     window.open(pdfURL, "_blank");
   }
 
-  // Open all WhatsApp tabs synchronously
+  // DO NOT encode text — emojis depend on this
   queuedNumbers.forEach(num => {
-    const url = `https://wa.me/${num}?text=${safeMsg}`;
-    window.open(url, "_blank");
+    window.open(`https://wa.me/${num}?text=${messageInput.value}`, "_blank");
   });
 
   progress.textContent = `Opened ${queuedNumbers.length} WhatsApp chats`;
