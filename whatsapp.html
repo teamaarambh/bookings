@@ -14,15 +14,15 @@ body{
   background:#f6f2eb;
   color:#533A5A;
 }
-.wrap{max-width:800px;margin:40px auto;padding:20px}
+.wrap{max-width:900px;margin:40px auto;padding:20px}
 .card{background:#fff;padding:24px;border-radius:16px}
 h2{text-align:center;margin-top:0}
 
 label{display:block;margin-top:16px;font-weight:600;font-size:14px}
-textarea,input{
+textarea,input,select{
   width:100%;
   margin-top:6px;
-  padding:10px;
+  padding:8px;
   border-radius:8px;
   border:1px solid #ccc;
 }
@@ -33,9 +33,9 @@ table{
   margin-top:20px;
 }
 th,td{
-  padding:10px;
+  padding:8px;
   border-bottom:1px solid #ddd;
-  font-size:14px;
+  font-size:13px;
 }
 th{background:#533A5A;color:white}
 tr:nth-child(even){background:#f6f2eb}
@@ -50,6 +50,16 @@ button{
   cursor:pointer;
   font-size:12px;
 }
+
+.status-sent{color:green;font-weight:700}
+.status-pending{color:#c0392b;font-weight:700}
+
+.filters{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:14px;
+}
 </style>
 </head>
 
@@ -58,8 +68,8 @@ button{
   <div class="card">
     <h2>WhatsApp Message Sender</h2>
 
-    <label>Message (use system emoji picker)</label>
-    <textarea id="messageInput" rows="10"
+    <label>Message</label>
+    <textarea id="messageInput" rows="6"
       placeholder="🎭 Drama Night 2.0 🎟️&#10;&#10;We’re back with an all-new edition!"></textarea>
 
     <label>PDF Attachment</label>
@@ -68,12 +78,27 @@ button{
     <label>Upload CSV / TXT (Name, Mobile)</label>
     <input type="file" id="nameNumberFile" accept=".csv,.txt">
 
+    <!-- SEARCH -->
+    <input id="globalSearch" placeholder="Search name / mobile / status" style="margin-top:16px">
+
+    <!-- FILTERS -->
+    <div class="filters">
+      <input id="filterName" placeholder="Filter Name">
+      <input id="filterMobile" placeholder="Filter Mobile">
+      <select id="filterStatus">
+        <option value="">All Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Sent">Sent</option>
+      </select>
+    </div>
+
     <table id="listTable" style="display:none">
       <thead>
         <tr>
           <th>#</th>
           <th>Name</th>
           <th>Mobile</th>
+          <th>Status</th>
           <th>Send</th>
         </tr>
       </thead>
@@ -90,6 +115,13 @@ const nameNumberFile = document.getElementById("nameNumberFile");
 const listBody = document.getElementById("listBody");
 const listTable = document.getElementById("listTable");
 
+const globalSearch = document.getElementById("globalSearch");
+const filterName = document.getElementById("filterName");
+const filterMobile = document.getElementById("filterMobile");
+const filterStatus = document.getElementById("filterStatus");
+
+let rowsData = [];
+
 /* Normalize Indian mobile numbers */
 function normalize(num){
   const d = num.replace(/\D/g,"");
@@ -98,78 +130,93 @@ function normalize(num){
   return null;
 }
 
-/* Preserve line breaks for WhatsApp */
 function formatMessage(msg){
-  return msg.replace(/\n/g, "%0A");
+  return msg.replace(/\n/g,"%0A");
 }
 
-/* Open PDF once (manual attach – WhatsApp limitation) */
 function openPDFOnce(){
   if(pdfInput.files[0]){
-    const pdfURL = URL.createObjectURL(pdfInput.files[0]);
-    window.open(pdfURL, "_blank");
+    window.open(URL.createObjectURL(pdfInput.files[0]),"_blank");
   }
 }
 
-/* Handle Name + Number file */
+/* Load file */
 nameNumberFile.onchange = async () => {
-  listBody.innerHTML = "";
-  listTable.style.display = "none";
-
-  if(!nameNumberFile.files[0]) return;
+  rowsData = [];
+  listBody.innerHTML="";
+  listTable.style.display="none";
 
   const text = await nameNumberFile.files[0].text();
-  const rows = text
-    .replace(/\uFEFF/g,"")
-    .split(/\r?\n/)
-    .map(r => r.trim())
-    .filter(Boolean);
+  const lines = text.replace(/\uFEFF/g,"").split(/\r?\n/).filter(Boolean);
 
-  let count = 0;
-
-  rows.forEach(row => {
-    const parts = row.split(",");
-    const name = parts[0]?.trim() || "";
-    const mobile = normalize(parts[1] || "");
-
+  lines.forEach(line=>{
+    const [name,mobileRaw] = line.split(",");
+    const mobile = normalize(mobileRaw || "");
     if(!mobile) return;
 
-    count++;
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${count}</td>
-      <td>${name || "-"}</td>
-      <td>${mobile}</td>
-      <td>
-        <button onclick="sendSingle('${mobile}')">Send</button>
-      </td>
+    rowsData.push({
+      name: name?.trim() || "-",
+      mobile,
+      status:"Pending"
+    });
+  });
+
+  renderTable();
+};
+
+function renderTable(){
+  listBody.innerHTML="";
+  listTable.style.display="table";
+
+  rowsData.forEach((r,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${i+1}</td>
+      <td>${r.name}</td>
+      <td>${r.mobile}</td>
+      <td class="${r.status==="Sent"?"status-sent":"status-pending"}">${r.status}</td>
+      <td><button onclick="sendRow(${i})">Send</button></td>
     `;
     listBody.appendChild(tr);
   });
 
-  if(count === 0){
-    alert("No valid name + number rows found");
-    return;
-  }
+  applyFilters();
+}
 
-  listTable.style.display = "table";
-};
-
-/* Send WhatsApp for a single row */
-function sendSingle(mobile){
-  if(!messageInput.value){
-    alert("Enter message first");
-    return;
-  }
+function sendRow(index){
+  if(!messageInput.value){ alert("Enter message first"); return; }
 
   openPDFOnce();
-
   const msg = formatMessage(messageInput.value);
-  window.open(
-    `https://wa.me/${mobile}?text=${msg}`,
-    "_blank"
-  );
+  window.open(`https://wa.me/${rowsData[index].mobile}?text=${msg}`,"_blank");
+
+  rowsData[index].status="Sent";
+  renderTable();
 }
+
+/* FILTERS + SEARCH */
+function applyFilters(){
+  const g = globalSearch.value.toLowerCase();
+  const fn = filterName.value.toLowerCase();
+  const fm = filterMobile.value.toLowerCase();
+  const fs = filterStatus.value;
+
+  [...listBody.rows].forEach((tr,i)=>{
+    const r = rowsData[i];
+    let show=true;
+
+    if(g && !(`${r.name}${r.mobile}${r.status}`.toLowerCase().includes(g))) show=false;
+    if(fn && !r.name.toLowerCase().includes(fn)) show=false;
+    if(fm && !r.mobile.includes(fm)) show=false;
+    if(fs && r.status!==fs) show=false;
+
+    tr.style.display = show ? "" : "none";
+  });
+}
+
+[globalSearch,filterName,filterMobile,filterStatus].forEach(el=>{
+  el.oninput=applyFilters;
+});
 </script>
 </body>
 </html>
