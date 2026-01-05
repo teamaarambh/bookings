@@ -50,13 +50,6 @@ button{
   cursor:pointer;
   font-size:12px;
 }
-
-.section{
-  border:1px dashed #ccc;
-  padding:16px;
-  border-radius:12px;
-  margin-top:20px;
-}
 </style>
 </head>
 
@@ -66,36 +59,26 @@ button{
     <h2>WhatsApp Message Sender</h2>
 
     <label>Message (use system emoji picker)</label>
-    <textarea id="messageInput" rows="8"
+    <textarea id="messageInput" rows="10"
       placeholder="🎭 Drama Night 2.0 🎟️&#10;&#10;We’re back with an all-new edition!"></textarea>
 
     <label>PDF Attachment</label>
     <input type="file" id="pdfInput" accept="application/pdf">
 
-    <!-- OPTION 1 -->
-    <div class="section">
-      <h3>Option 1 — Numbers Only (Send WhatsApp)</h3>
-      <input type="file" id="numbersFile" accept=".csv,.txt">
-      <button onclick="sendFromNumbersFile()">Send WhatsApp to All Numbers</button>
-    </div>
+    <label>Upload CSV / TXT (Name, Mobile)</label>
+    <input type="file" id="nameNumberFile" accept=".csv,.txt">
 
-    <!-- OPTION 2 -->
-    <div class="section">
-      <h3>Option 2 — Name + Number (Display on Page)</h3>
-      <input type="file" id="nameNumberFile" accept=".csv,.txt">
-
-      <table id="listTable" style="display:none">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Send</th>
-          </tr>
-        </thead>
-        <tbody id="listBody"></tbody>
-      </table>
-    </div>
+    <table id="listTable" style="display:none">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Mobile</th>
+          <th>Send</th>
+        </tr>
+      </thead>
+      <tbody id="listBody"></tbody>
+    </table>
 
   </div>
 </div>
@@ -103,12 +86,11 @@ button{
 <script>
 const messageInput = document.getElementById("messageInput");
 const pdfInput = document.getElementById("pdfInput");
-const numbersFile = document.getElementById("numbersFile");
 const nameNumberFile = document.getElementById("nameNumberFile");
 const listBody = document.getElementById("listBody");
 const listTable = document.getElementById("listTable");
 
-/* Normalize Indian numbers */
+/* Normalize Indian mobile numbers */
 function normalize(num){
   const d = num.replace(/\D/g,"");
   if(d.length === 10) return "91" + d;
@@ -116,12 +98,12 @@ function normalize(num){
   return null;
 }
 
-/* Encode line breaks for WhatsApp */
+/* Preserve line breaks for WhatsApp */
 function formatMessage(msg){
   return msg.replace(/\n/g, "%0A");
 }
 
-/* Open PDF once (manual attach) */
+/* Open PDF once (manual attach – WhatsApp limitation) */
 function openPDFOnce(){
   if(pdfInput.files[0]){
     const pdfURL = URL.createObjectURL(pdfInput.files[0]);
@@ -129,38 +111,7 @@ function openPDFOnce(){
   }
 }
 
-/* OPTION 1 — Numbers only */
-async function sendFromNumbersFile(){
-  if(!numbersFile.files[0]){
-    alert("Upload numbers-only file");
-    return;
-  }
-  if(!messageInput.value){
-    alert("Enter message first");
-    return;
-  }
-
-  const text = await numbersFile.files[0].text();
-  const numbers = text
-    .replace(/\uFEFF/g,"")
-    .split(/[\n,]/)
-    .map(v => normalize(v.trim()))
-    .filter(Boolean);
-
-  if(numbers.length === 0){
-    alert("No valid numbers found");
-    return;
-  }
-
-  openPDFOnce();
-
-  const msg = formatMessage(messageInput.value);
-  numbers.forEach(num => {
-    window.open(`https://wa.me/${num}?text=${msg}`, "_blank");
-  });
-}
-
-/* OPTION 2 — Name + Number (Display) */
+/* Handle Name + Number file */
 nameNumberFile.onchange = async () => {
   listBody.innerHTML = "";
   listTable.style.display = "none";
@@ -177,15 +128,17 @@ nameNumberFile.onchange = async () => {
   let count = 0;
 
   rows.forEach(row => {
-    const [name, mobileRaw] = row.split(",");
-    const mobile = normalize(mobileRaw || "");
+    const parts = row.split(",");
+    const name = parts[0]?.trim() || "";
+    const mobile = normalize(parts[1] || "");
+
     if(!mobile) return;
 
     count++;
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${count}</td>
-      <td>${name?.trim() || "-"}</td>
+      <td>${name || "-"}</td>
       <td>${mobile}</td>
       <td>
         <button onclick="sendSingle('${mobile}')">Send</button>
@@ -195,14 +148,14 @@ nameNumberFile.onchange = async () => {
   });
 
   if(count === 0){
-    alert("No valid name+number rows found");
+    alert("No valid name + number rows found");
     return;
   }
 
   listTable.style.display = "table";
 };
 
-/* Send single (from table) */
+/* Send WhatsApp for a single row */
 function sendSingle(mobile){
   if(!messageInput.value){
     alert("Enter message first");
@@ -210,8 +163,12 @@ function sendSingle(mobile){
   }
 
   openPDFOnce();
+
   const msg = formatMessage(messageInput.value);
-  window.open(`https://wa.me/${mobile}?text=${msg}`, "_blank");
+  window.open(
+    `https://wa.me/${mobile}?text=${msg}`,
+    "_blank"
+  );
 }
 </script>
 </body>
