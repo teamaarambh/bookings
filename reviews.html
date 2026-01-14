@@ -132,26 +132,27 @@ async function loadReviews(){
 
 /* Submit review */
 submitReview.onclick = async () => {
-  if(!name.value || !review.value){
+  const userName = document.getElementById("name").value.trim();
+  const userReview = document.getElementById("review").value.trim();
+
+  if (!userName || !userReview) {
     alert("Please fill all fields");
     return;
   }
 
-  await addDoc(collection(db,"reviews"),{
-    name: name.value.trim(),
-    rating: Number(rating.value),
-    review: review.value.trim(),
+  await addDoc(collection(db, "reviews"), {
+    name: userName,
+    rating: Number(document.getElementById("rating").value),
+    review: userReview,
     createdAt: serverTimestamp()
   });
 
-  name.value = "";
-  review.value = "";
-  rating.value = "5";
+  document.getElementById("name").value = "";
+  document.getElementById("review").value = "";
+  document.getElementById("rating").value = "5";
 
   loadReviews();
 };
-
-loadReviews();
 </script>
 </body>
 </html>
