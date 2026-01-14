@@ -170,42 +170,37 @@
     nav a, .brand h1, .lead-copy p, .poster-thumb, footer, .btn-primary, .btn-secondary, .countdown-container {
       font-family: 'Montserrat Alternates', sans-serif !important;
     }
+    .home-review{
+  padding:16px 0;
+  border-bottom:1px solid rgba(0,0,0,0.1);
+}
+.home-review:last-child{border-bottom:none}
+
+.home-review-name{
+  font-weight:800;
+  color:var(--accent);
+}
+
+.home-review-text{
+  font-size:14px;
+  opacity:.9;
+  margin-top:6px;
+}
+
+.home-play-rating{
+  font-size:13px;
+  margin-top:4px;
+}
   </style>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;600;700&family=Pompiere&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<div id="site-header"></div>
+  <body>
 
   <!-- HEADER -->
-<header>
-  <!-- CLICKABLE LOGO -->
-  <a href="index.html" class="brand">
-    <img src="AarambhLogo2.png" alt="Aarambh logo">
-    <div>
-      <h1 style="font-family:'Cinzel Decorative', serif !important;margin:0;color:var(--bg);">
-        Aarambh
-      </h1>
-      <div style="font-size:12px;color:var(--muted);font-weight:700;font-family:'Pompiere',cursive !important">
-        Where every story begins
-      </div>
-    </div>
-  </a>
 
-  <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
-
-  <nav aria-label="Primary navigation">
-    <a href="index.html">Home</a>
-    <a href="team.html" target="_blank">Team Aarambh</a>
-    <a href="contact.html">Contact Us</a>
-    <a href="reviews.html">Reviews</a>
-    <a class="btn-secondary"
-       href="select-seats.html"
-       style="background:var(--bg);color:var(--accent);border-color:var(--bg);">
-      Book Tickets
-    </a>
-  </nav>
-</header>
 
   <main class="wrap">
     <!-- Lead / hero card -->
@@ -345,7 +340,18 @@
     </section>
 
   </main>
+<!-- HOME PAGE REVIEWS -->
+<section class="wrap" style="margin-top:40px">
+  <div class="card">
+    <h2 style="text-align:center;margin-top:0">What Our Audience Says</h2>
 
+    <div id="homeReviews"></div>
+
+    <div style="text-align:center;margin-top:20px">
+      <a href="reviews.html" class="btn-secondary">View All Reviews</a>
+    </div>
+  </div>
+</section>
   <!-- Contact + Footer -->
   <footer id="contact">
     <div style="max-width:900px;margin:20px auto;padding:20px;text-align:center">
@@ -435,5 +441,16 @@ function openDirections() {
   );
 }
 </script>
-  </body>
-</html>
+    <script src="header.js"></script>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    query,
+    orderBy,
+    limit
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const app = in
