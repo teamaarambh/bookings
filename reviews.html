@@ -212,21 +212,32 @@
     });
   }
 
-  form.addEventListener("submit", async e=>{
-    e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    await addDoc(collection(db,"reviews"),{
-      name: name.value.trim(),
-      rating: Number(rating.value),
-      review: review.value.trim(),
-      createdAt: serverTimestamp()
-    });
+  const nameInput = document.getElementById("name");
+  const ratingInput = document.getElementById("rating");
+  const reviewInput = document.getElementById("review");
 
-    form.reset();
-    loadReviews();
+  const name = nameInput.value.trim();
+  const rating = Number(ratingInput.value);
+  const review = reviewInput.value.trim();
+
+  if (!name || !rating || !review) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  await addDoc(collection(db, "reviews"), {
+    name,
+    rating,
+    review,
+    createdAt: serverTimestamp()
   });
 
+  form.reset();
   loadReviews();
+});
 </script>
 
 </body>
