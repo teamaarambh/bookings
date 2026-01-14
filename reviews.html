@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="header.css">
 
   <style>
-    *, *::before, *::after{font-family:inherit !important;box-sizing:border-box}
+    *,*::before,*::after{font-family:inherit!important;box-sizing:border-box}
 
     :root{
       --accent:#533A5A;
@@ -20,19 +20,18 @@
       --bg:#FFFFFF;
       --card:#EADFC8;
       --text:#533A5A;
-      --glass: rgba(255,255,255,0.6);
     }
 
     html,body{
       margin:0;
-      font-family:'Montserrat Alternates',sans-serif !important;
+      font-family:'Montserrat Alternates',sans-serif!important;
       background:var(--bg);
       color:var(--text);
       line-height:1.45;
     }
 
     h1,h2,h3{
-      font-family:'Cinzel Decorative',serif !important;
+      font-family:'Cinzel Decorative',serif!important;
       color:var(--accent);
     }
 
@@ -42,17 +41,17 @@
       background:var(--card);
       border-radius:16px;
       padding:28px;
-      box-shadow:0 10px 30px rgba(83,58,90,0.08);
+      box-shadow:0 10px 30px rgba(83,58,90,.08);
       margin-bottom:30px;
     }
 
-    label{font-weight:700;margin-top:10px;display:block}
+    label{font-weight:700;display:block;margin-top:10px}
 
     input,textarea,select{
       width:100%;
       padding:12px 14px;
       border-radius:10px;
-      border:1px solid rgba(0,0,0,0.15);
+      border:1px solid rgba(0,0,0,.15);
       margin-top:6px;
       margin-bottom:14px;
       font-size:14px;
@@ -73,7 +72,7 @@
 
     .submit-btn:disabled{opacity:.6;cursor:not-allowed}
 
-    .review{padding:16px 0;border-bottom:1px solid rgba(0,0,0,0.1)}
+    .review{padding:16px 0;border-bottom:1px solid rgba(0,0,0,.1)}
     .review:last-child{border-bottom:none}
 
     .review-name{font-weight:800;color:var(--accent)}
@@ -97,14 +96,12 @@
     <h2 style="text-align:center;margin-top:0">Leave a Review</h2>
 
     <form id="reviewForm">
-
       <label>Your Name</label>
-      <input id="name" type="text" placeholder="Your name" required>
+      <input id="name" required>
 
       <label>Overall Review</label>
-      <textarea id="review" placeholder="Share your overall experience..." required></textarea>
+      <textarea id="review" required></textarea>
 
-      <!-- OPTIONAL PLAY RATINGS -->
       <label>Kahaani Thodi Filmy Hai (optional)</label>
       <select id="play1">
         <option value="">No rating</option>
@@ -135,9 +132,7 @@
         <option value="1">⭐</option>
       </select>
 
-      <button class="submit-btn" id="submitBtn" type="submit">
-        Submit Review
-      </button>
+      <button id="submitBtn" class="submit-btn">Submit Review</button>
     </form>
   </section>
 
@@ -149,25 +144,13 @@
 
 </main>
 
-<footer>
-  © Team Aarambh — All rights reserved
-</footer>
+<footer>© Team Aarambh — All rights reserved</footer>
 
 <!-- TOAST -->
 <div id="toast" style="
-  position:fixed;
-  bottom:30px;
-  left:50%;
-  transform:translateX(-50%);
-  background:var(--accent);
-  color:var(--bg);
-  padding:14px 22px;
-  border-radius:14px;
-  font-weight:700;
-  opacity:0;
-  pointer-events:none;
-  transition:.3s;
-  box-shadow:0 10px 30px rgba(83,58,90,0.25);
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+  background:var(--accent);color:#fff;padding:14px 22px;border-radius:14px;
+  font-weight:700;opacity:0;pointer-events:none;transition:.3s;
 "></div>
 
 <script src="header.js"></script>
@@ -183,20 +166,18 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } 
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const app = initializeApp({
     apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
     authDomain: "aarambh-ticket-bookings.firebaseapp.com",
     projectId: "aarambh-ticket-bookings",
-    storageBucket: "aarambh-ticket-bookings.firebasestorage.app",
     messagingSenderId: "269445606104",
     appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
   });
 
   const db = getFirestore(app);
-
   const stars = n => "⭐".repeat(n);
 
   async function loadReviews(){
@@ -222,18 +203,30 @@
     });
   }
 
-  document.getElementById("reviewForm").addEventListener("submit",async e=>{
+  document.getElementById("reviewForm").addEventListener("submit", async e=>{
     e.preventDefault();
 
+    const name=document.getElementById("name").value.trim();
+    const review=document.getElementById("review").value.trim();
+    if(!name||!review){showToast("Fill name and review");return;}
+
+    const last=localStorage.getItem("lastReviewTime");
+    if(last && Date.now()-last < 5*60*1000){
+      showToast("Please wait before submitting again 🙏");
+      return;
+    }
+
     const playRatings={};
-    const p1=+play1.value, p2=+play2.value, p3=+play3.value;
+    const p1=Number(document.getElementById("play1").value);
+    const p2=Number(document.getElementById("play2").value);
+    const p3=Number(document.getElementById("play3").value);
     if(p1) playRatings.kahaani=p1;
     if(p2) playRatings.humsafar=p2;
     if(p3) playRatings.panvel=p3;
 
     await addDoc(collection(db,"reviews"),{
-      name:name.value.trim(),
-      review:review.value.trim(),
+      name,
+      review,
       playRatings,
       createdAt:serverTimestamp()
     });
