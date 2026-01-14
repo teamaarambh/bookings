@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Aarambh — Home</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;600;700&family=Pompiere&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after{box-sizing:border-box;font-family:inherit!important}
+
+    :root{
+      --accent:#533A5A;
+      --muted:#EEB885;
+      --bg:#FFFFFF;
+      --card:#EADFC8;
+      --text:#533A5A;
+      --glass: rgba(255,255,255,0.6);
+    }
+
+    html,body{
+      margin:0;
+      font-family:'Montserrat Alternates',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    /* HEADER */
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:18px 28px;
+      background:var(--accent);
+      color:var(--bg);
+      position:sticky;
+      top:0;
+      z-index:50;
+      box-shadow:0 6px 24px rgba(83,58,90,.08);
+    }
+
+    /* ✅ FIXED BRAND */
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      text-decoration:none;
+      color:inherit;
+    }
+    .brand img{height:56px;display:block}
+    .brand h1{font-size:18px;margin:0;color:var(--bg);font-family:'Cinzel Decorative',serif!important}
+
+    nav{display:flex;gap:20px;align-items:center}
+    nav a{
+      color:var(--bg);
+      text-decoration:none;
+      font-weight:600;
+      padding:6px 8px;
+      border-radius:8px;
+    }
+    nav a:hover{background:var(--glass)}
+
+    .btn-secondary{
+      background:var(--bg);
+      color:var(--accent);
+      padding:10px 16px;
+      border-radius:12px;
+      font-weight:700;
+      text-decoration:none;
+    }
+
+    .nav-toggle{
+      display:none;
+      background:none;
+      border:0;
+      color:var(--bg);
+      font-size:20px;
+    }
+
+    @media(max-width:720px){
+      .nav-toggle{display:block}
+      nav{
+        position:fixed;
+        right:0;
+        top:64px;
+        background:var(--accent);
+        width:260px;
+        height:calc(100% - 64px);
+        flex-direction:column;
+        padding:20px;
+        transform:translateX(100%);
+        transition:.25s ease;
+      }
+      nav.open{transform:translateX(0)}
+    }
+
+    .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+  <!-- ✅ CLICKABLE LOGO -->
+  <a href="index.html" class="brand">
+    <img src="AarambhLogo2.png" alt="Aarambh logo">
+    <div>
+      <h1>Aarambh</h1>
+      <div style="font-size:12px;color:var(--muted);font-family:'Pompiere',cursive">
+        Where every story begins
+      </div>
+    </div>
+  </a>
+
+  <button class="nav-toggle" aria-label="Open menu">☰</button>
+
+  <!-- ✅ NAV (REVIEWS VISIBLE) -->
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="team.html" target="_blank">Team Aarambh</a>
+    <a href="contact.html">Contact Us</a>
+    <a href="reviews.html">Reviews</a>
+    <a class="btn-secondary" href="select-seats.html">Book Tickets</a>
+  </nav>
+</header>
+
+<!-- PAGE CONTENT -->
+<main class="wrap">
+  <h2 style="font-family:'Cinzel Decorative',serif">Drama Night 2.0</h2>
+  <p>
+    Season 1 was a runaway hit — and now Team Aarambh returns with Drama Night 2.0.
+  </p>
+</main>
+
+<!-- MOBILE NAV SCRIPT -->
+<script>
+(function(){
+  const btn=document.querySelector('.nav-toggle');
+  const nav=document.querySelector('nav');
+  btn.onclick=()=>nav.classList.toggle('open');
+})();
+</script>
+
+</body>
+</html>
