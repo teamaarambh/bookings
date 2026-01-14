@@ -170,6 +170,27 @@
     nav a, .brand h1, .lead-copy p, .poster-thumb, footer, .btn-primary, .btn-secondary, .countdown-container {
       font-family: 'Montserrat Alternates', sans-serif !important;
     }
+    .home-review{
+  padding:16px 0;
+  border-bottom:1px solid rgba(0,0,0,0.1);
+}
+.home-review:last-child{border-bottom:none}
+
+.home-review-name{
+  font-weight:800;
+  color:var(--accent);
+}
+
+.home-review-text{
+  font-size:14px;
+  opacity:.9;
+  margin-top:6px;
+}
+
+.home-play-rating{
+  font-size:13px;
+  margin-top:4px;
+}
   </style>
 
   <!-- Google Fonts -->
@@ -319,7 +340,18 @@
     </section>
 
   </main>
+<!-- HOME PAGE REVIEWS -->
+<section class="wrap" style="margin-top:40px">
+  <div class="card">
+    <h2 style="text-align:center;margin-top:0">What Our Audience Says</h2>
 
+    <div id="homeReviews"></div>
+
+    <div style="text-align:center;margin-top:20px">
+      <a href="reviews.html" class="btn-secondary">View All Reviews</a>
+    </div>
+  </div>
+</section>
   <!-- Contact + Footer -->
   <footer id="contact">
     <div style="max-width:900px;margin:20px auto;padding:20px;text-align:center">
@@ -410,5 +442,63 @@ function openDirections() {
 }
 </script>
     <script src="header.js"></script>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    query,
+    orderBy,
+    limit
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const app = initializeApp({
+    apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
+    authDomain: "aarambh-ticket-bookings.firebaseapp.com",
+    projectId: "aarambh-ticket-bookings",
+    messagingSenderId: "269445606104",
+    appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
+  });
+
+  const db = getFirestore(app);
+  const stars = n => "⭐".repeat(n);
+
+  async function loadHomeReviews(){
+    const container = document.getElementById("homeReviews");
+    if(!container) return;
+
+    const q = query(
+      collection(db,"reviews"),
+      orderBy("createdAt","desc"),
+      limit(3)
+    );
+
+    const snap = await getDocs(q);
+    container.innerHTML = "";
+
+    snap.forEach(doc=>{
+      const r = doc.data();
+      let plays = "";
+
+      if(r.playRatings?.kahaani)
+        plays += `<div class="home-play-rating">Kahaani Thodi Filmy Hai: ${stars(r.playRatings.kahaani)}</div>`;
+      if(r.playRatings?.humsafar)
+        plays += `<div class="home-play-rating">Humsafar Express: ${stars(r.playRatings.humsafar)}</div>`;
+      if(r.playRatings?.panvel)
+        plays += `<div class="home-play-rating">Jaldi Kar Panvel Nikalna Hai: ${stars(r.playRatings.panvel)}</div>`;
+
+      container.innerHTML += `
+        <div class="home-review">
+          <div class="home-review-name">${r.name}</div>
+          <div class="home-review-text">${r.review}</div>
+          ${plays}
+        </div>
+      `;
+    });
+  }
+
+  loadHomeReviews();
+    </script>
   </body>
 </html>
