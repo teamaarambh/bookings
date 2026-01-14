@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Aarambh • Reviews</title>
+<title>Aarambh • Customer Reviews</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;600;700&display=swap" rel="stylesheet">
@@ -16,7 +16,6 @@ body{
 }
 .wrap{max-width:720px;margin:40px auto;padding:20px}
 .card{background:#fff;padding:24px;border-radius:16px;margin-bottom:20px}
-
 h2{text-align:center;margin-top:0}
 
 input,textarea,select{
@@ -58,7 +57,7 @@ button{
     <h2>Leave a Review</h2>
 
     <input id="name" placeholder="Your name">
-    
+
     <select id="rating">
       <option value="5">⭐⭐⭐⭐⭐ (5)</option>
       <option value="4">⭐⭐⭐⭐ (4)</option>
@@ -87,24 +86,29 @@ import {
   collection,
   addDoc,
   getDocs,
-  orderBy,
   query,
+  orderBy,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* Firebase config (use SAME project as bookings) */
-const app = initializeApp({
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID"
-});
+/* ✅ YOUR EXISTING FIREBASE CONFIG (UNCHANGED) */
+const firebaseConfig = {
+  apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
+  authDomain: "aarambh-ticket-bookings.firebaseapp.com",
+  databaseURL: "https://aarambh-ticket-bookings-default-rtdb.firebaseio.com",
+  projectId: "aarambh-ticket-bookings",
+  storageBucket: "aarambh-ticket-bookings.firebasestorage.app",
+  messagingSenderId: "269445606104",
+  appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
+};
 
+/* SAFE INIT */
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /* Helpers */
-function formatDate(d){
-  return d ? new Date(d.seconds * 1000).toLocaleString() : "";
+function formatDate(ts){
+  return ts ? new Date(ts.seconds * 1000).toLocaleString() : "";
 }
 
 /* Load reviews */
