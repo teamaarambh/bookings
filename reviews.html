@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Aarambh — Reviews</title>
 
-  <!-- Google Fonts (EXACT SAME AS INDEX) -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;600;700&family=Pompiere&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- Shared Header CSS -->
   <link rel="stylesheet" href="header.css">
 
   <style>
-    /* FORCE FONT INHERITANCE — MATCH INDEX.HTML */
-    *, *::before, *::after { font-family: inherit !important; box-sizing: border-box; }
+    *, *::before, *::after{font-family:inherit !important;box-sizing:border-box}
 
     :root{
       --accent:#533A5A;
@@ -24,26 +23,20 @@
       --glass: rgba(255,255,255,0.6);
     }
 
-    html, body{
+    html,body{
       margin:0;
-      font-family:'Montserrat Alternates', sans-serif !important;
+      font-family:'Montserrat Alternates',sans-serif !important;
       background:var(--bg);
       color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
       line-height:1.45;
     }
 
     h1,h2,h3{
-      font-family:'Cinzel Decorative', serif !important;
+      font-family:'Cinzel Decorative',serif !important;
       color:var(--accent);
     }
 
-    .wrap{
-      max-width:900px;
-      margin:44px auto;
-      padding:0 20px;
-    }
+    .wrap{max-width:900px;margin:44px auto;padding:0 20px}
 
     .card{
       background:var(--card);
@@ -53,18 +46,19 @@
       margin-bottom:30px;
     }
 
-    .review-form input,
-    .review-form textarea,
-    .review-form select{
+    label{font-weight:700;margin-top:10px;display:block}
+
+    input,textarea,select{
       width:100%;
       padding:12px 14px;
       border-radius:10px;
       border:1px solid rgba(0,0,0,0.15);
+      margin-top:6px;
       margin-bottom:14px;
       font-size:14px;
     }
 
-    .review-form textarea{ min-height:110px; resize:vertical; }
+    textarea{min-height:110px;resize:vertical}
 
     .submit-btn{
       width:100%;
@@ -77,42 +71,17 @@
       cursor:pointer;
     }
 
-    .submit-btn:hover{ opacity:.95 }
+    .submit-btn:disabled{opacity:.6;cursor:not-allowed}
 
-    .review{
-      padding:16px 0;
-      border-bottom:1px solid rgba(0,0,0,0.1);
-    }
-    .review:last-child{ border-bottom:none }
+    .review{padding:16px 0;border-bottom:1px solid rgba(0,0,0,0.1)}
+    .review:last-child{border-bottom:none}
 
-    .review-name{
-      font-weight:800;
-      color:var(--accent);
-    }
+    .review-name{font-weight:800;color:var(--accent)}
+    .review-text{font-size:14px;opacity:.9;margin-top:6px}
+    .play-rating{font-size:13px;margin-top:4px}
+    .review-date{font-size:12px;opacity:.6;margin-top:6px}
 
-    .review-stars{
-      color:#f5b301;
-      font-size:14px;
-      margin:4px 0;
-    }
-
-    .review-text{
-      font-size:14px;
-      opacity:.9;
-    }
-
-    .review-date{
-      font-size:12px;
-      opacity:.6;
-      margin-top:4px;
-    }
-
-    footer{
-      margin-top:40px;
-      padding:26px 20px;
-      text-align:center;
-      color:var(--muted);
-    }
+    footer{margin-top:40px;padding:26px 20px;text-align:center;color:var(--muted)}
   </style>
 </head>
 
@@ -127,21 +96,48 @@
   <section class="card">
     <h2 style="text-align:center;margin-top:0">Leave a Review</h2>
 
-    <form class="review-form" id="reviewForm">
+    <form id="reviewForm">
+
+      <label>Your Name</label>
       <input id="name" type="text" placeholder="Your name" required>
 
-      <select id="rating" required>
-        <option value="">Rating</option>
-        <option value="5">★★★★★ (5)</option>
-        <option value="4">★★★★☆ (4)</option>
-        <option value="3">★★★☆☆ (3)</option>
-        <option value="2">★★☆☆☆ (2)</option>
-        <option value="1">★☆☆☆☆ (1)</option>
+      <label>Overall Review</label>
+      <textarea id="review" placeholder="Share your overall experience..." required></textarea>
+
+      <!-- OPTIONAL PLAY RATINGS -->
+      <label>Kahaani Thodi Filmy Hai (optional)</label>
+      <select id="play1">
+        <option value="">No rating</option>
+        <option value="5">⭐⭐⭐⭐⭐</option>
+        <option value="4">⭐⭐⭐⭐</option>
+        <option value="3">⭐⭐⭐</option>
+        <option value="2">⭐⭐</option>
+        <option value="1">⭐</option>
       </select>
 
-      <textarea id="review" placeholder="Write your review..." required></textarea>
+      <label>Humsafar Express (optional)</label>
+      <select id="play2">
+        <option value="">No rating</option>
+        <option value="5">⭐⭐⭐⭐⭐</option>
+        <option value="4">⭐⭐⭐⭐</option>
+        <option value="3">⭐⭐⭐</option>
+        <option value="2">⭐⭐</option>
+        <option value="1">⭐</option>
+      </select>
 
-      <button class="submit-btn" type="submit">Submit Review</button>
+      <label>Jaldi Kar Panvel Nikalna Hai (optional)</label>
+      <select id="play3">
+        <option value="">No rating</option>
+        <option value="5">⭐⭐⭐⭐⭐</option>
+        <option value="4">⭐⭐⭐⭐</option>
+        <option value="3">⭐⭐⭐</option>
+        <option value="2">⭐⭐</option>
+        <option value="1">⭐</option>
+      </select>
+
+      <button class="submit-btn" id="submitBtn" type="submit">
+        Submit Review
+      </button>
     </form>
   </section>
 
@@ -157,87 +153,98 @@
   © Team Aarambh — All rights reserved
 </footer>
 
-<!-- SHARED HEADER LOADER -->
+<!-- TOAST -->
+<div id="toast" style="
+  position:fixed;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--accent);
+  color:var(--bg);
+  padding:14px 22px;
+  border-radius:14px;
+  font-weight:700;
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
+  box-shadow:0 10px 30px rgba(83,58,90,0.25);
+"></div>
+
 <script src="header.js"></script>
 
-<!-- FIREBASE + REVIEWS -->
+<script>
+  function showToast(msg){
+    const t=document.getElementById("toast");
+    t.textContent=msg;
+    t.style.opacity="1";
+    setTimeout(()=>t.style.opacity="0",2500);
+  }
+</script>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    orderBy,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = {
+  const app = initializeApp({
     apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
     authDomain: "aarambh-ticket-bookings.firebaseapp.com",
     projectId: "aarambh-ticket-bookings",
     storageBucket: "aarambh-ticket-bookings.firebasestorage.app",
     messagingSenderId: "269445606104",
     appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
-  };
+  });
 
-  const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const form = document.getElementById("reviewForm");
-  const reviewsList = document.getElementById("reviewsList");
-
-  const stars = r => "★".repeat(r) + "☆".repeat(5 - r);
+  const stars = n => "⭐".repeat(n);
 
   async function loadReviews(){
-    reviewsList.innerHTML = "";
-
-    const q = query(collection(db,"reviews"), orderBy("createdAt","desc"));
-    const snap = await getDocs(q);
+    const list=document.getElementById("reviewsList");
+    list.innerHTML="";
+    const q=query(collection(db,"reviews"),orderBy("createdAt","desc"));
+    const snap=await getDocs(q);
 
     snap.forEach(doc=>{
-      const r = doc.data();
-      const div = document.createElement("div");
-      div.className = "review";
-      div.innerHTML = `
-        <div class="review-name">${r.name}</div>
-        <div class="review-stars">${stars(r.rating)}</div>
-        <div class="review-text">${r.review}</div>
-        <div class="review-date">
-          ${r.createdAt?.toDate().toLocaleDateString()}
-        </div>
-      `;
-      reviewsList.appendChild(div);
+      const r=doc.data();
+      let plays="";
+      if(r.playRatings?.kahaani) plays+=`<div class="play-rating">Kahaani Thodi Filmy Hai: ${stars(r.playRatings.kahaani)}</div>`;
+      if(r.playRatings?.humsafar) plays+=`<div class="play-rating">Humsafar Express: ${stars(r.playRatings.humsafar)}</div>`;
+      if(r.playRatings?.panvel) plays+=`<div class="play-rating">Jaldi Kar Panvel Nikalna Hai: ${stars(r.playRatings.panvel)}</div>`;
+
+      list.innerHTML+=`
+        <div class="review">
+          <div class="review-name">${r.name}</div>
+          <div class="review-text">${r.review}</div>
+          ${plays}
+          <div class="review-date">${r.createdAt?.toDate().toLocaleDateString()}</div>
+        </div>`;
     });
   }
 
-  form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  document.getElementById("reviewForm").addEventListener("submit",async e=>{
+    e.preventDefault();
 
-  const nameInput = document.getElementById("name");
-  const ratingInput = document.getElementById("rating");
-  const reviewInput = document.getElementById("review");
+    const playRatings={};
+    const p1=+play1.value, p2=+play2.value, p3=+play3.value;
+    if(p1) playRatings.kahaani=p1;
+    if(p2) playRatings.humsafar=p2;
+    if(p3) playRatings.panvel=p3;
 
-  const name = nameInput.value.trim();
-  const rating = Number(ratingInput.value);
-  const review = reviewInput.value.trim();
+    await addDoc(collection(db,"reviews"),{
+      name:name.value.trim(),
+      review:review.value.trim(),
+      playRatings,
+      createdAt:serverTimestamp()
+    });
 
-  if (!name || !rating || !review) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  await addDoc(collection(db, "reviews"), {
-    name,
-    rating,
-    review,
-    createdAt: serverTimestamp()
+    localStorage.setItem("lastReviewTime",Date.now());
+    e.target.reset();
+    loadReviews();
+    showToast("Review submitted successfully 🎉");
   });
 
-  form.reset();
   loadReviews();
-});
 </script>
 
 </body>
