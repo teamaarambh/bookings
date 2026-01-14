@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Team — Aarambh</title>
 
-  <!-- Google Fonts (same as other pages) -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;600;700&family=Pompiere&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Shared Header CSS -->
+  <link rel="stylesheet" href="header.css">
 
   <style>
     :root{
@@ -15,9 +18,10 @@
       --bg:#FFFFFF;
       --card:#EADFC8;
       --text:#533A5A;
-      --glass: rgba(255,255,255,0.6);
     }
+
     *{box-sizing:border-box}
+
     html,body{
       margin:0;
       font-family:'Montserrat Alternates',sans-serif;
@@ -26,58 +30,29 @@
       -webkit-font-smoothing:antialiased;
     }
 
-    /* Header (consistent with other pages) */
-    header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:18px 28px;
-      background:var(--accent);
-      color:var(--bg);
-      position:sticky;
-      top:0;
-      z-index:50;
-      box-shadow:0 6px 24px rgba(83,58,90,0.08);
-    }
-    .brand{display:flex;align-items:center;gap:14px}
-    .brand img{height:56px;display:block}
-    .brand h1{font-family:'Cinzel Decorative',serif;margin:0;color:var(--bg);font-size:18px}
-    nav{display:flex;gap:18px;align-items:center}
-    nav a{color:var(--bg);text-decoration:none;font-weight:600;padding:6px 8px;border-radius:8px;}
-    nav a:hover{background:var(--glass);}
-
-    .btn-secondary{
-      background:var(--bg);
-      color:var(--accent);
-      padding:10px 16px;
-      border-radius:12px;
-      font-weight:700;
-      border:2px solid var(--bg);
-    }
-
-    .nav-toggle{display:none;background:transparent;border:0;color:var(--bg);font-size:20px;padding:8px;border-radius:8px}
-    @media(max-width:720px){
-      .nav-toggle{display:inline-flex}
-      nav{position:fixed;right:0;top:64px;background:var(--accent);width:260px;height:calc(100% - 64px);flex-direction:column;align-items:flex-start;padding:20px;gap:14px;transform:translateX(100%);transition:transform .25s ease;z-index:60}
-      nav.open{transform:translateX(0)}
-      nav a{width:100%;padding:10px 12px;border-radius:8px}
-    }
-
-    /* Page container */
     .wrap{max-width:1100px;margin:44px auto;padding:0 20px}
 
     .hero{
       display:flex;
-      align-items:center;
       justify-content:space-between;
+      align-items:center;
       gap:20px;
       margin-bottom:28px;
       flex-wrap:wrap;
     }
-    .hero .title{font-family:'Cinzel Decorative',serif;font-size:32px;color:var(--accent)}
-    .hero .desc{font-family:'Pompiere',cursive;color:var(--muted);font-weight:700}
 
-    /* Team grid */
+    .hero .title{
+      font-family:'Cinzel Decorative',serif;
+      font-size:32px;
+      color:var(--accent);
+    }
+
+    .hero .desc{
+      font-family:'Pompiere',cursive;
+      color:var(--muted);
+      font-weight:700;
+    }
+
     .team-grid{
       display:grid;
       grid-template-columns:repeat(4,1fr);
@@ -94,9 +69,13 @@
       flex-direction:column;
       align-items:center;
       text-align:center;
-      transition:transform .12s ease,box-shadow .12s ease;
+      transition:transform .12s ease, box-shadow .12s ease;
     }
-    .card:hover{transform:translateY(-6px);box-shadow:0 18px 36px rgba(83,58,90,0.12)}
+
+    .card:hover{
+      transform:translateY(-6px);
+      box-shadow:0 18px 36px rgba(83,58,90,0.12);
+    }
 
     .avatar{
       width:120px;
@@ -108,49 +87,47 @@
       align-items:center;
       justify-content:center;
       margin-bottom:12px;
-      border:4px solid rgba(83,58,90,0.04);
     }
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
 
-    .name{font-weight:800;color:var(--accent);font-family:'Cinzel Decorative',serif;margin-bottom:6px}
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
 
-    /* Responsive */
+    .name{
+      font-weight:800;
+      color:var(--accent);
+      font-family:'Cinzel Decorative',serif;
+    }
+
     @media(max-width:1100px){
       .team-grid{grid-template-columns:repeat(3,1fr)}
     }
+
     @media(max-width:800px){
       .team-grid{grid-template-columns:repeat(2,1fr)}
     }
+
     @media(max-width:480px){
       .team-grid{grid-template-columns:1fr}
-      .brand img{height:48px}
     }
 
-    footer{margin-top:40px;padding:26px 20px;text-align:center;color:var(--muted)}
+    footer{
+      margin-top:40px;
+      padding:26px 20px;
+      text-align:center;
+      color:var(--muted);
+    }
   </style>
 </head>
+
 <body>
 
-<header>
-  <div class="brand">
-    <img src="AarambhLogo2.png" alt="Aarambh logo">
-    <div>
-      <h1>Aarambh</h1>
-      <div class="secondary" style="font-size:12px;color:var(--muted);font-family:'Pompiere';">Where every story begins</div>
-    </div>
-  </div>
+<!-- SHARED HEADER -->
+<div id="site-header"></div>
 
-  <button class="nav-toggle" aria-label="Open menu">☰</button>
-
-  <nav aria-label="Primary navigation">
-    <a href="index.html">Home</a>
-    <a href="team.html">Team Aarambh</a>
-    <a href="contact.html">Contact Us</a>
-    <a class="btn-secondary" href="select-seats.html">Book Tickets</a>
-  </nav>
-</header>
-
-<main class="wrap" role="main">
+<main class="wrap">
   <div class="hero">
     <div>
       <div class="title">Team Aarambh</div>
@@ -161,137 +138,29 @@
   <section aria-label="Team members">
     <div class="team-grid">
 
-      <!-- 1 -->
-      <article class="card" aria-labelledby="tm1">
-        <div class="avatar" aria-hidden="true"><img src="Yogesh.jpg" alt="Yogesh Patil"></div>
-        <div id="tm1" class="name">Yogesh Patil</div>
-      </article>
+      <article class="card"><div class="avatar"><img src="Yogesh.jpg"></div><div class="name">Yogesh Patil</div></article>
+      <article class="card"><div class="avatar"><img src="Prathik.jpg"></div><div class="name">Prathik</div></article>
+      <article class="card"><div class="avatar"><img src="Lalit.jpg"></div><div class="name">Lalit Nigaam</div></article>
+      <article class="card"><div class="avatar"><img src="Nikhil.jpg"></div><div class="name">Nikhil Kalekar</div></article>
+      <article class="card"><div class="avatar"><img src="Abhilasha.jpg"></div><div class="name">Abhilasha Sharma</div></article>
+      <article class="card"><div class="avatar"><img src="Nilesh.jpg"></div><div class="name">Nilesh Ghule</div></article>
+      <article class="card"><div class="avatar"><img src="Vaidehi.jpg"></div><div class="name">Vaidehi Pande</div></article>
+      <article class="card"><div class="avatar"><img src="Ashwini.jpg"></div><div class="name">Ashwini Patil</div></article>
+      <article class="card"><div class="avatar"><img src="Tejashree.jpg"></div><div class="name">Tejashree Kumbhar</div></article>
+      <article class="card"><div class="avatar"><img src="Riya.jpg"></div><div class="name">Riya Debnath</div></article>
+      <article class="card"><div class="avatar"><img src="Minakshi.jpg"></div><div class="name">Minakshi Kalelkar</div></article>
+      <article class="card"><div class="avatar"><img src="MAuli.jpg"></div><div class="name">Mauli Nalawde</div></article>
+      <article class="card"><div class="avatar"><img src="Saurabh.jpg"></div><div class="name">Saurabh Mahamuni</div></article>
+      <article class="card"><div class="avatar"><img src="Rohini.jpg"></div><div class="name">Rohini Jadhav</div></article>
+      <article class="card"><div class="avatar"><img src="Kaynat.jpg"></div><div class="name">Kaynat Mirza</div></article>
+      <article class="card"><div class="avatar"><img src="Aradhana.jpg"></div><div class="name">Aradhana Mohanan</div></article>
+      <article class="card"><div class="avatar"><img src="Amit.jpg"></div><div class="name">Amit Mahato</div></article>
+      <article class="card"><div class="avatar"><img src="Shivani.jpg"></div><div class="name">Shivani Nalawde</div></article>
+      <article class="card"><div class="avatar"><img src="Saumya.jpg"></div><div class="name">Saumya Bajpai</div></article>
+      <article class="card"><div class="avatar"><img src="Bessy.jpg"></div><div class="name">Bessy Alexander</div></article>
+      <article class="card"><div class="avatar"><img src="Dwiti.jpg"></div><div class="name">Dwiti Kariya</div></article>
+      <article class="card"><div class="avatar"><img src="Dipak.jpg"></div><div class="name">Dipak Pardeshi</div></article>
 
-      <!-- 2 -->
-      <article class="card" aria-labelledby="tm2">
-        <div class="avatar"><img src="Prathik.jpg" alt="Prathik"></div>
-        <div id="tm2" class="name">Prathik</div>
-      </article>
-
-      <!-- 3 -->
-      <article class="card" aria-labelledby="tm3">
-        <div class="avatar"><img src="Lalit.jpg" alt="Lalit Nigaam"></div>
-        <div id="tm3" class="name">Lalit Nigaam</div>
-      </article>
-
-      <!-- 4 -->
-      <article class="card" aria-labelledby="tm4">
-        <div class="avatar"><img src="Nikhil.jpg" alt="Nikhil Kalekar"></div>
-        <div id="tm4" class="name">Nikhil Kalekar</div>
-      </article>
-
-      <!-- 5 -->
-      <article class="card" aria-labelledby="tm5">
-        <div class="avatar"><img src="Abhilasha.jpg" alt="Abhilasha Sharma"></div>
-        <div id="tm5" class="name">Abhilasha Sharma</div>
-      </article>
-
-      <!-- 6 -->
-      <article class="card" aria-labelledby="tm6">
-        <div class="avatar"><img src="Nilesh.jpg" alt="Nilesh Ghule"></div>
-        <div id="tm6" class="name">Nilesh Ghule</div>
-      </article>
-
-      <!-- 7 -->
-      <article class="card" aria-labelledby="tm7">
-        <div class="avatar"><img src="Vaidehi.jpg" alt="Vaidehi Pande"></div>
-        <div id="tm7" class="name">Vaidehi Pande</div>
-      </article>
-
-      <!-- 8 -->
-      <article class="card" aria-labelledby="tm8">
-        <div class="avatar"><img src="Ashwini.jpg" alt="Ashwini Patil"></div>
-        <div id="tm8" class="name">Ashwini Patil</div>
-      </article>
-
-      <!-- 9 -->
-      <article class="card" aria-labelledby="tm9">
-        <div class="avatar"><img src="Tejashree.jpg" alt="Tejashree Kumbhar"></div>
-        <div id="tm9" class="name">Tejashree Kumbhar</div>
-      </article>
-
-      <!-- 10 -->
-      <article class="card" aria-labelledby="tm10">
-        <div class="avatar"><img src="Riya.jpg" alt="Riya Debnath"></div>
-        <div id="tm10" class="name">Riya Debnath</div>
-      </article>
-
-      <!-- 11 -->
-      <article class="card" aria-labelledby="tm11">
-        <div class="avatar"><img src="Minakshi.jpg" alt="Minakshi Kalelkar"></div>
-        <div id="tm11" class="name">Minakshi Kalelkar</div>
-      </article>
-
-      <!-- 12 -->
-      <article class="card" aria-labelledby="tm12">
-        <div class="avatar"><img src="MAuli.jpg" alt="Mauli Nalawde"></div>
-        <div id="tm12" class="name">Mauli Nalawde</div>
-      </article>
-
-      <!-- 13 -->
-      <article class="card" aria-labelledby="tm13">
-        <div class="avatar"><img src="Saurabh.jpg" alt="Saurabh Mahamuni"></div>
-        <div id="tm13" class="name">Saurabh Mahamuni</div>
-      </article>
-
-      <!-- 14 -->
-      <article class="card" aria-labelledby="tm14">
-        <div class="avatar"><img src="Rohini.jpg" alt="Rohini Jadhav"></div>
-        <div id="tm14" class="name">Rohini Jadhav</div>
-      </article>
-
-      <!-- 15 -->
-      <article class="card" aria-labelledby="tm15">
-        <div class="avatar"><img src="Kaynat.jpg" alt="Kaynat Mirza"></div>
-        <div id="tm15" class="name">Kaynat Mirza</div>
-      </article>
-
-      <!-- 16 -->
-      <article class="card" aria-labelledby="tm16">
-        <div class="avatar"><img src="Aradhana.jpg" alt="Aradhana Mohanan"></div>
-        <div id="tm16" class="name">Aradhana Mohanan</div>
-      </article>
-
-      <!-- 17 -->
-      <article class="card" aria-labelledby="tm17">
-        <div class="avatar"><img src="Amit.jpg" alt="Amit Mahato"></div>
-        <div id="tm17" class="name">Amit Mahato</div>
-      </article>
-
-      <!-- 18 -->
-      <article class="card" aria-labelledby="tm18">
-        <div class="avatar"><img src="Shivani.jpg" alt="Shivani Nalawde"></div>
-        <div id="tm18" class="name">Shivani Nalawde</div>
-      </article>
-
-      <!-- 19 -->
-      <article class="card" aria-labelledby="tm19">
-        <div class="avatar"><img src="Saumya.jpg" alt="Saumya Bajpai"></div>
-        <div id="tm19" class="name">Saumya Bajpai</div>
-      </article>
-
-      <!-- 20 -->
-      <article class="card" aria-labelledby="tm20">
-        <div class="avatar"><img src="Bessy.jpg" alt="Bessy Alexander"></div>
-        <div id="tm20" class="name">Bessy Alexander</div>
-      </article>
-			
-      <!-- 21 -->
-      <article class="card" aria-labelledby="tm21">
-        <div class="avatar"><img src="Dwiti.jpg" alt="Dwiti Kariya"></div>
-        <div id="tm21" class="name">Dwiti Kariya</div>
-      </article>
-		
-	  <!-- 21 -->
-      <article class="card" aria-labelledby="tm22">
-        <div class="avatar"><img src="Dipak.jpg" alt="Dipak Pardeshi"></div>
-        <div id="tm22" class="name">Dipak Pardeshi</div>
-      </article>
     </div>
   </section>
 </main>
@@ -300,20 +169,8 @@
   © Team Aarambh — All rights reserved
 </footer>
 
-<script>
-  // mobile nav toggle (same as other pages)
-  (function(){
-    var btn = document.querySelector('.nav-toggle');
-    var nav = document.querySelector('header nav');
-    if(!btn || !nav) return;
-    btn.addEventListener('click', function(){ nav.classList.toggle('open'); });
-    nav.addEventListener('click', function(e){
-      if(e.target.tagName === 'A' && nav.classList.contains('open')){
-        nav.classList.remove('open');
-      }
-    });
-    window.addEventListener('resize', function(){ if(window.innerWidth > 720){ nav.classList.remove('open'); } });
-  })();
-</script>
+<!-- SHARED HEADER JS -->
+<script src="header.js"></script>
+
 </body>
 </html>
