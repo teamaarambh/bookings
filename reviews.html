@@ -5,22 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Aarambh — Reviews</title>
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts (EXACT SAME AS INDEX) -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;600;700&family=Pompiere&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Shared Header CSS -->
+  <link rel="stylesheet" href="header.css">
 
   <style>
     /* FORCE FONT INHERITANCE — MATCH INDEX.HTML */
-*, *::before, *::after {
-  font-family: inherit !important;
-}
-
-html, body {
-  margin: 0;
-  font-family: 'Montserrat Alternates', sans-serif !important;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-    *, *::before, *::after{font-family:inherit!important;box-sizing:border-box}
+    *, *::before, *::after { font-family: inherit !important; box-sizing: border-box; }
 
     :root{
       --accent:#533A5A;
@@ -31,74 +24,21 @@ html, body {
       --glass: rgba(255,255,255,0.6);
     }
 
-    html,body{
+    html, body{
       margin:0;
-      font-family:'Montserrat Alternates',sans-serif;
+      font-family:'Montserrat Alternates', sans-serif !important;
       background:var(--bg);
       color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
       line-height:1.45;
     }
 
-    /* ===== HEADER (EXACT COPY FROM INDEX) ===== */
-    header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:18px 28px;
-      background:var(--accent);
-      color:var(--bg);
-      position:sticky;
-      top:0;
-      z-index:50;
-      box-shadow:0 6px 24px rgba(83,58,90,0.08);
-    }
-    .brand{display:flex;align-items:center;gap:14px}
-    .brand img{height:56px;display:block}
-    .brand h1{
-      font-size:18px;
-      margin:0;
-      color:var(--bg);
-      font-family:'Cinzel Decorative',serif;
-    }
-    nav{display:flex;gap:20px;align-items:center}
-    nav a{
-      color:var(--bg);
-      text-decoration:none;
-      font-weight:600;
-      padding:6px 8px;
-      border-radius:8px;
-    }
-    nav a:hover{background:var(--glass)}
-
-    .btn-secondary{
-      background:var(--bg);
+    h1,h2,h3{
+      font-family:'Cinzel Decorative', serif !important;
       color:var(--accent);
-      padding:10px 16px;
-      border-radius:12px;
-      font-weight:700;
-      text-decoration:none;
     }
 
-    .nav-toggle{display:none;background:none;border:0;color:var(--bg);font-size:20px}
-
-    @media(max-width:720px){
-      .nav-toggle{display:inline-flex}
-      nav{
-        position:fixed;
-        right:0;
-        top:64px;
-        background:var(--accent);
-        width:260px;
-        height:calc(100% - 64px);
-        flex-direction:column;
-        padding:20px;
-        transform:translateX(100%);
-        transition:.25s ease;
-      }
-      nav.open{transform:translateX(0)}
-    }
-
-    /* ===== PAGE ===== */
     .wrap{
       max-width:900px;
       margin:44px auto;
@@ -113,25 +53,20 @@ html, body {
       margin-bottom:30px;
     }
 
-    h2{
-      font-family:'Cinzel Decorative',serif;
-      text-align:center;
-      margin:0 0 18px;
-      color:var(--accent);
-    }
-
-    input,select,textarea{
+    .review-form input,
+    .review-form textarea,
+    .review-form select{
       width:100%;
       padding:12px 14px;
       border-radius:10px;
-      border:1px solid rgba(0,0,0,.15);
+      border:1px solid rgba(0,0,0,0.15);
       margin-bottom:14px;
-      font-family:inherit;
+      font-size:14px;
     }
 
-    textarea{min-height:100px}
+    .review-form textarea{ min-height:110px; resize:vertical; }
 
-    button{
+    .submit-btn{
       width:100%;
       background:var(--accent);
       color:var(--bg);
@@ -142,16 +77,36 @@ html, body {
       cursor:pointer;
     }
 
-    .review{
-      border-bottom:1px solid rgba(0,0,0,.1);
-      padding:14px 0;
-    }
-    .review:last-child{border-bottom:none}
-    .review .name{font-weight:800;color:var(--accent)}
-    .review .stars{color:#f5b301;font-size:14px}
-    .review .text{font-size:14px;opacity:.9}
+    .submit-btn:hover{ opacity:.95 }
 
-    /* ===== FOOTER (EXACT COPY FROM INDEX) ===== */
+    .review{
+      padding:16px 0;
+      border-bottom:1px solid rgba(0,0,0,0.1);
+    }
+    .review:last-child{ border-bottom:none }
+
+    .review-name{
+      font-weight:800;
+      color:var(--accent);
+    }
+
+    .review-stars{
+      color:#f5b301;
+      font-size:14px;
+      margin:4px 0;
+    }
+
+    .review-text{
+      font-size:14px;
+      opacity:.9;
+    }
+
+    .review-date{
+      font-size:12px;
+      opacity:.6;
+      margin-top:4px;
+    }
+
     footer{
       margin-top:40px;
       padding:26px 20px;
@@ -163,71 +118,115 @@ html, body {
 
 <body>
 
-<!-- HEADER -->
-<header>
-  <div class="brand">
-    <img src="AarambhLogo2.png" alt="Aarambh logo">
-    <div>
-      <h1>Aarambh</h1>
-      <div style="font-size:12px;color:var(--muted);font-family:'Pompiere'">
-        Where every story begins
-      </div>
-    </div>
-  </div>
+<!-- SHARED HEADER -->
+<div id="site-header"></div>
 
-  <button class="nav-toggle">☰</button>
-
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="team.html">Team Aarambh</a>
-    <a href="contact.html">Contact Us</a>
-    <a href="reviews.html" style="background:var(--glass)">Reviews</a>
-    <a class="btn-secondary" href="select-seats.html">Book Tickets</a>
-  </nav>
-</header>
-
-<!-- CONTENT -->
 <main class="wrap">
 
+  <!-- SUBMIT REVIEW -->
   <section class="card">
-    <h2>Leave a Review</h2>
+    <h2 style="text-align:center;margin-top:0">Leave a Review</h2>
 
-    <input type="text" placeholder="Your name">
-    <select>
-      <option>★★★★★ (5)</option>
-      <option>★★★★☆ (4)</option>
-      <option>★★★☆☆ (3)</option>
-      <option>★★☆☆☆ (2)</option>
-      <option>★☆☆☆☆ (1)</option>
-    </select>
-    <textarea placeholder="Write your review..."></textarea>
-    <button>Submit Review</button>
+    <form class="review-form" id="reviewForm">
+      <input id="name" type="text" placeholder="Your name" required>
+
+      <select id="rating" required>
+        <option value="">Rating</option>
+        <option value="5">★★★★★ (5)</option>
+        <option value="4">★★★★☆ (4)</option>
+        <option value="3">★★★☆☆ (3)</option>
+        <option value="2">★★☆☆☆ (2)</option>
+        <option value="1">★☆☆☆☆ (1)</option>
+      </select>
+
+      <textarea id="review" placeholder="Write your review..." required></textarea>
+
+      <button class="submit-btn" type="submit">Submit Review</button>
+    </form>
   </section>
 
+  <!-- REVIEWS LIST -->
   <section class="card">
-    <h2>Customer Reviews</h2>
-
-    <div class="review">
-      <div class="name">Sample User</div>
-      <div class="stars">★★★★★</div>
-      <div class="text">Amazing experience!</div>
-    </div>
-
+    <h2 style="text-align:center;margin-top:0">Customer Reviews</h2>
+    <div id="reviewsList"></div>
   </section>
 
 </main>
 
-<!-- FOOTER -->
 <footer>
   © Team Aarambh — All rights reserved
 </footer>
 
-<script>
-(function(){
-  const btn=document.querySelector('.nav-toggle');
-  const nav=document.querySelector('nav');
-  btn.onclick=()=>nav.classList.toggle('open');
-})();
+<!-- SHARED HEADER LOADER -->
+<script src="header.js"></script>
+
+<!-- FIREBASE + REVIEWS -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
+    authDomain: "aarambh-ticket-bookings.firebaseapp.com",
+    projectId: "aarambh-ticket-bookings",
+    storageBucket: "aarambh-ticket-bookings.firebasestorage.app",
+    messagingSenderId: "269445606104",
+    appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const form = document.getElementById("reviewForm");
+  const reviewsList = document.getElementById("reviewsList");
+
+  const stars = r => "★".repeat(r) + "☆".repeat(5 - r);
+
+  async function loadReviews(){
+    reviewsList.innerHTML = "";
+
+    const q = query(collection(db,"reviews"), orderBy("createdAt","desc"));
+    const snap = await getDocs(q);
+
+    snap.forEach(doc=>{
+      const r = doc.data();
+      const div = document.createElement("div");
+      div.className = "review";
+      div.innerHTML = `
+        <div class="review-name">${r.name}</div>
+        <div class="review-stars">${stars(r.rating)}</div>
+        <div class="review-text">${r.review}</div>
+        <div class="review-date">
+          ${r.createdAt?.toDate().toLocaleDateString()}
+        </div>
+      `;
+      reviewsList.appendChild(div);
+    });
+  }
+
+  form.addEventListener("submit", async e=>{
+    e.preventDefault();
+
+    await addDoc(collection(db,"reviews"),{
+      name: name.value.trim(),
+      rating: Number(rating.value),
+      review: review.value.trim(),
+      createdAt: serverTimestamp()
+    });
+
+    form.reset();
+    loadReviews();
+  });
+
+  loadReviews();
 </script>
 
 </body>
