@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Aarambh • Reviews</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Montserrat Alternates',sans-serif;
+  background:#f6f2eb;
+  color:#533A5A;
+}
+.wrap{max-width:720px;margin:40px auto;padding:20px}
+.card{background:#fff;padding:24px;border-radius:16px;margin-bottom:20px}
+
+h2{text-align:center;margin-top:0}
+
+input,textarea,select{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+button{
+  margin-top:14px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:10px;
+  background:#533A5A;
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.review{
+  border-bottom:1px solid #eee;
+  padding:14px 0;
+}
+.review:last-child{border-bottom:none}
+
+.stars{color:#f39c12;font-size:14px}
+.date{font-size:11px;opacity:.6}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- ADD REVIEW -->
+  <div class="card">
+    <h2>Leave a Review</h2>
+
+    <input id="name" placeholder="Your name">
+    
+    <select id="rating">
+      <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+      <option value="4">⭐⭐⭐⭐ (4)</option>
+      <option value="3">⭐⭐⭐ (3)</option>
+      <option value="2">⭐⭐ (2)</option>
+      <option value="1">⭐ (1)</option>
+    </select>
+
+    <textarea id="review" rows="4" placeholder="Write your review..."></textarea>
+
+    <button id="submitReview">Submit Review</button>
+  </div>
+
+  <!-- REVIEWS LIST -->
+  <div class="card">
+    <h2>Customer Reviews</h2>
+    <div id="reviewsList"></div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* Firebase config (use SAME project as bookings) */
+const app = initializeApp({
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
+});
+
+const db = getFirestore(app);
+
+/* Helpers */
+function formatDate(d){
+  return d ? new Date(d.seconds * 1000).toLocaleString() : "";
+}
+
+/* Load reviews */
+async function loadReviews(){
+  reviewsList.innerHTML = "";
+  const q = query(collection(db,"reviews"), orderBy("createdAt","desc"));
+  const snap = await getDocs(q);
+
+  snap.forEach(doc=>{
+    const r = doc.data();
+    reviewsList.innerHTML += `
+      <div class="review">
+        <b>${r.name}</b>
+        <div class="stars">${"⭐".repeat(r.rating)}</div>
+        <div>${r.review}</div>
+        <div class="date">${formatDate(r.createdAt)}</div>
+      </div>
+    `;
+  });
+}
+
+/* Submit review */
+submitReview.onclick = async () => {
+  if(!name.value || !review.value){
+    alert("Please fill all fields");
+    return;
+  }
+
+  await addDoc(collection(db,"reviews"),{
+    name: name.value.trim(),
+    rating: Number(rating.value),
+    review: review.value.trim(),
+    createdAt: serverTimestamp()
+  });
+
+  name.value = "";
+  review.value = "";
+  rating.value = "5";
+
+  loadReviews();
+};
+
+loadReviews();
+</script>
+</body>
+</html>
