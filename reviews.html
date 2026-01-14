@@ -1,160 +1,223 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Aarambh • Customer Reviews</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Aarambh — Reviews</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="header.css">
-<style>
-  body{
-  margin:0;
-  font-family:'Montserrat Alternates',sans-serif;
-  background:#f6f2eb;
-  color:#533A5A;
-}
-.wrap{max-width:720px;margin:40px auto;padding:20px}
-.card{background:#fff;padding:24px;border-radius:16px;margin-bottom:20px}
-h2{text-align:center;margin-top:0}
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;600;700&family=Pompiere&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
 
-input,textarea,select{
-  width:100%;
-  padding:10px;
-  margin-top:6px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
+  <style>
+    *, *::before, *::after{font-family:inherit!important;box-sizing:border-box}
 
-button{
-  margin-top:14px;
-  padding:10px;
-  width:100%;
-  border:none;
-  border-radius:10px;
-  background:#533A5A;
-  color:white;
-  font-weight:700;
-  cursor:pointer;
-}
+    :root{
+      --accent:#533A5A;
+      --muted:#EEB885;
+      --bg:#FFFFFF;
+      --card:#EADFC8;
+      --text:#533A5A;
+      --glass: rgba(255,255,255,0.6);
+    }
 
-.review{
-  border-bottom:1px solid #eee;
-  padding:14px 0;
-}
-.review:last-child{border-bottom:none}
+    html,body{
+      margin:0;
+      font-family:'Montserrat Alternates',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
 
-.stars{color:#f39c12;font-size:14px}
-.date{font-size:11px;opacity:.6}
-</style>
+    /* ===== HEADER (EXACT COPY FROM INDEX) ===== */
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:18px 28px;
+      background:var(--accent);
+      color:var(--bg);
+      position:sticky;
+      top:0;
+      z-index:50;
+      box-shadow:0 6px 24px rgba(83,58,90,0.08);
+    }
+    .brand{display:flex;align-items:center;gap:14px}
+    .brand img{height:56px;display:block}
+    .brand h1{
+      font-size:18px;
+      margin:0;
+      color:var(--bg);
+      font-family:'Cinzel Decorative',serif;
+    }
+    nav{display:flex;gap:20px;align-items:center}
+    nav a{
+      color:var(--bg);
+      text-decoration:none;
+      font-weight:600;
+      padding:6px 8px;
+      border-radius:8px;
+    }
+    nav a:hover{background:var(--glass)}
+
+    .btn-secondary{
+      background:var(--bg);
+      color:var(--accent);
+      padding:10px 16px;
+      border-radius:12px;
+      font-weight:700;
+      text-decoration:none;
+    }
+
+    .nav-toggle{display:none;background:none;border:0;color:var(--bg);font-size:20px}
+
+    @media(max-width:720px){
+      .nav-toggle{display:inline-flex}
+      nav{
+        position:fixed;
+        right:0;
+        top:64px;
+        background:var(--accent);
+        width:260px;
+        height:calc(100% - 64px);
+        flex-direction:column;
+        padding:20px;
+        transform:translateX(100%);
+        transition:.25s ease;
+      }
+      nav.open{transform:translateX(0)}
+    }
+
+    /* ===== PAGE ===== */
+    .wrap{
+      max-width:900px;
+      margin:44px auto;
+      padding:0 20px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:16px;
+      padding:28px;
+      box-shadow:0 10px 30px rgba(83,58,90,0.08);
+      margin-bottom:30px;
+    }
+
+    h2{
+      font-family:'Cinzel Decorative',serif;
+      text-align:center;
+      margin:0 0 18px;
+      color:var(--accent);
+    }
+
+    input,select,textarea{
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid rgba(0,0,0,.15);
+      margin-bottom:14px;
+      font-family:inherit;
+    }
+
+    textarea{min-height:100px}
+
+    button{
+      width:100%;
+      background:var(--accent);
+      color:var(--bg);
+      border:none;
+      padding:14px;
+      border-radius:14px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .review{
+      border-bottom:1px solid rgba(0,0,0,.1);
+      padding:14px 0;
+    }
+    .review:last-child{border-bottom:none}
+    .review .name{font-weight:800;color:var(--accent)}
+    .review .stars{color:#f5b301;font-size:14px}
+    .review .text{font-size:14px;opacity:.9}
+
+    /* ===== FOOTER (EXACT COPY FROM INDEX) ===== */
+    footer{
+      margin-top:40px;
+      padding:26px 20px;
+      text-align:center;
+      color:var(--muted);
+    }
+  </style>
 </head>
 
 <body>
-<div id="site-header"></div>
-  <div class="wrap">
 
-  <!-- ADD REVIEW -->
-  <div class="card">
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <img src="AarambhLogo2.png" alt="Aarambh logo">
+    <div>
+      <h1>Aarambh</h1>
+      <div style="font-size:12px;color:var(--muted);font-family:'Pompiere'">
+        Where every story begins
+      </div>
+    </div>
+  </div>
+
+  <button class="nav-toggle">☰</button>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="team.html">Team Aarambh</a>
+    <a href="contact.html">Contact Us</a>
+    <a href="reviews.html" style="background:var(--glass)">Reviews</a>
+    <a class="btn-secondary" href="select-seats.html">Book Tickets</a>
+  </nav>
+</header>
+
+<!-- CONTENT -->
+<main class="wrap">
+
+  <section class="card">
     <h2>Leave a Review</h2>
 
-    <input id="name" placeholder="Your name">
-
-    <select id="rating">
-      <option value="5">⭐⭐⭐⭐⭐ (5)</option>
-      <option value="4">⭐⭐⭐⭐ (4)</option>
-      <option value="3">⭐⭐⭐ (3)</option>
-      <option value="2">⭐⭐ (2)</option>
-      <option value="1">⭐ (1)</option>
+    <input type="text" placeholder="Your name">
+    <select>
+      <option>★★★★★ (5)</option>
+      <option>★★★★☆ (4)</option>
+      <option>★★★☆☆ (3)</option>
+      <option>★★☆☆☆ (2)</option>
+      <option>★☆☆☆☆ (1)</option>
     </select>
+    <textarea placeholder="Write your review..."></textarea>
+    <button>Submit Review</button>
+  </section>
 
-    <textarea id="review" rows="4" placeholder="Write your review..."></textarea>
-
-    <button id="submitReview">Submit Review</button>
-  </div>
-
-  <!-- REVIEWS LIST -->
-  <div class="card">
+  <section class="card">
     <h2>Customer Reviews</h2>
-    <div id="reviewsList"></div>
-  </div>
 
-</div>
+    <div class="review">
+      <div class="name">Sample User</div>
+      <div class="stars">★★★★★</div>
+      <div class="text">Amazing experience!</div>
+    </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  orderBy,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  </section>
 
-/* ✅ YOUR EXISTING FIREBASE CONFIG (UNCHANGED) */
-const firebaseConfig = {
-  apiKey: "AIzaSyCz5-f1FZMxcfs2yc29hXNLz9636Q2jjKg",
-  authDomain: "aarambh-ticket-bookings.firebaseapp.com",
-  databaseURL: "https://aarambh-ticket-bookings-default-rtdb.firebaseio.com",
-  projectId: "aarambh-ticket-bookings",
-  storageBucket: "aarambh-ticket-bookings.firebasestorage.app",
-  messagingSenderId: "269445606104",
-  appId: "1:269445606104:web:4ee4beecee2d77cd5f45ad"
-};
+</main>
 
-/* SAFE INIT */
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+<!-- FOOTER -->
+<footer>
+  © Team Aarambh — All rights reserved
+</footer>
 
-/* Helpers */
-function formatDate(ts){
-  return ts ? new Date(ts.seconds * 1000).toLocaleString() : "";
-}
-
-/* Load reviews */
-async function loadReviews(){
-  reviewsList.innerHTML = "";
-  const q = query(collection(db,"reviews"), orderBy("createdAt","desc"));
-  const snap = await getDocs(q);
-
-  snap.forEach(doc=>{
-    const r = doc.data();
-    reviewsList.innerHTML += `
-      <div class="review">
-        <b>${r.name}</b>
-        <div class="stars">${"⭐".repeat(r.rating)}</div>
-        <div>${r.review}</div>
-        <div class="date">${formatDate(r.createdAt)}</div>
-      </div>
-    `;
-  });
-}
-
-/* Submit review */
-submitReview.onclick = async () => {
-  const userName = document.getElementById("name").value.trim();
-  const userReview = document.getElementById("review").value.trim();
-
-  if (!userName || !userReview) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  await addDoc(collection(db, "reviews"), {
-    name: userName,
-    rating: Number(document.getElementById("rating").value),
-    review: userReview,
-    createdAt: serverTimestamp()
-  });
-
-  document.getElementById("name").value = "";
-  document.getElementById("review").value = "";
-  document.getElementById("rating").value = "5";
-
-  loadReviews();
-};
+<script>
+(function(){
+  const btn=document.querySelector('.nav-toggle');
+  const nav=document.querySelector('nav');
+  btn.onclick=()=>nav.classList.toggle('open');
+})();
 </script>
-  <script src="header.js"></script>
+
 </body>
 </html>
